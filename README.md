@@ -1,4 +1,4 @@
-# Mohaj AI - Smart Tab Management System
+# AI - Smart Tab Management System
 
 ## Main Process Flow
 
@@ -17,7 +17,7 @@
 }}%%
 flowchart LR
     %% Main Process Container
-    subgraph Process[" Mohaj AI Process "]
+    subgraph Process[" AI Process "]
         direction TB
         
         %% Core Flow
@@ -91,10 +91,10 @@ flowchart LR
 
 ## Installation
 
-1. Clone the Mohaj AI repository:
+1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/mohaj-ai.git
-cd mohaj-ai
+git clone https://github.com/yourusername/smart-tab-manager.git
+cd smart-tab-manager
 ```
 
 2. Install dependencies:
@@ -124,7 +124,7 @@ npm run watch
 
 ## Usage
 
-1. Click the Mohaj AI icon in your Chrome toolbar
+1. Click the extension icon in your Chrome toolbar
 2. Select a window from the dropdown to view its tabs
 3. Drag and drop tabs between windows using the drop zones
 4. Use the pin/unpin and close buttons to manage tabs
