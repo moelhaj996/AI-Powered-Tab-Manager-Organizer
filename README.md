@@ -4,37 +4,57 @@
 
 ```mermaid
 flowchart TD
-    Start([Start]) --> Init[Initialize Extension]
+    %% Initialization Process
+    Start([Mohaj AI]) --> Init[Initialize Extension]
     Init --> LoadWindows[Load Chrome Windows]
     LoadWindows --> LoadTabs[Fetch All Tabs]
     
-    subgraph User_Interface[User Interface Layer]
-        LoadTabs --> UI[Show Window Manager]
-        UI --> |Select Window| WindowView[Display Window Tabs]
-        UI --> |Drag Tab| DragOp[Drag Operation]
-        UI --> |Click Actions| TabOp[Tab Operations]
+    %% User Interface Layer with rounded edges
+    subgraph User_Interface[" User Interface Layer "]
+        direction TB
+        LoadTabs --> |Initialize| UI[Window Manager]
+        UI --> |"1. Select"| WindowView["Display Window Tabs"]
+        UI --> |"2. Drag"| DragOp["Drag Operation"]
+        UI --> |"3. Click"| TabOp["Tab Actions"]
     end
 
-    subgraph Tab_Operations[Tab Management]
-        DragOp --> |Drop on Window| MoveTab[Move Tab to Window]
-        DragOp --> |Drop in List| ReorderTab[Reorder Tab Position]
-        TabOp --> |Pin| PinTab[Toggle Pin State]
-        TabOp --> |Close| CloseTab[Close Tab]
+    %% Tab Operations with clear actions
+    subgraph Tab_Operations[" Tab Management "]
+        direction TB
+        DragOp --> |"Drop"| MoveTab["Move to Window"]
+        DragOp --> |"Reorder"| ReorderTab["Change Position"]
+        TabOp --> |"Toggle"| PinTab["Pin/Unpin"]
+        TabOp --> |"Remove"| CloseTab["Close Tab"]
     end
 
-    subgraph State_Updates[State Management]
-        MoveTab --> UpdateState[Update State]
-        ReorderTab --> UpdateState
-        PinTab --> UpdateState
-        CloseTab --> UpdateState
-        UpdateState --> RefreshUI[Refresh UI]
-        RefreshUI --> UI
+    %% State Management with feedback loop
+    subgraph State_Updates[" State Management "]
+        direction TB
+        MoveTab & ReorderTab & PinTab & CloseTab --> UpdateState["Update State"]
+        UpdateState --> RefreshUI["Refresh UI"]
+        RefreshUI --> |"Update"| UI
     end
 
-    style Start fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style User_Interface fill:#e6f3ff,stroke:#333,stroke-width:2px
-    style Tab_Operations fill:#ffe6e6,stroke:#333,stroke-width:2px
-    style State_Updates fill:#e6ffe6,stroke:#333,stroke-width:2px
+    %% Styling
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px
+    classDef start fill:#f0f8ff,stroke:#2563eb,stroke-width:3px
+    classDef process fill:#ffffff,stroke:#333,stroke-width:1px
+    
+    class Start start
+    class Init,LoadWindows,LoadTabs process
+    
+    %% Subgraph styling
+    style User_Interface fill:#e6f3ff,stroke:#2563eb,stroke-width:2px
+    style Tab_Operations fill:#ffe6e6,stroke:#dc2626,stroke-width:2px
+    style State_Updates fill:#e6ffe6,stroke:#16a34a,stroke-width:2px
+    
+    %% Node styling
+    style UI fill:#ffffff,stroke:#2563eb,stroke-width:2px
+    style WindowView,DragOp,TabOp fill:#ffffff,stroke:#2563eb,stroke-width:1px
+    
+    style MoveTab,ReorderTab,PinTab,CloseTab fill:#ffffff,stroke:#dc2626,stroke-width:1px
+    
+    style UpdateState,RefreshUI fill:#ffffff,stroke:#16a34a,stroke-width:1px
 ```
 
 ## Features
