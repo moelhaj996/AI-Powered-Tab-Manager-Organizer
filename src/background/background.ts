@@ -1,5 +1,14 @@
-import * as tf from '@tensorflow/tfjs';
-import { load } from '@tensorflow-models/universal-sentence-encoder';
+// Initialize TensorFlow.js
+async function initTensorFlow() {
+  try {
+    const tf = await import('@tensorflow/tfjs');
+    const { load } = await import('@tensorflow-models/universal-sentence-encoder');
+    return { tf, load };
+  } catch (error: any) {
+    console.error('Error initializing TensorFlow:', error);
+    throw new Error(error.message || 'Failed to initialize TensorFlow');
+  }
+}
 
 let model: any = null;
 let isModelLoading = false;
@@ -20,6 +29,7 @@ async function initModel() {
 
   try {
     isModelLoading = true;
+    const { load } = await initTensorFlow();
     model = await load();
     console.log('TensorFlow model loaded successfully');
     return model;
@@ -31,62 +41,79 @@ async function initModel() {
   }
 }
 
-// Process tabs and group them using the AI model
-async function processTabGroups(tabs: chrome.tabs.Tab[]) {
-  try {
-    const currentModel = await initModel();
-    
-    if (!currentModel) {
-      throw new Error('Failed to initialize AI model');
-    }
-
-    const tabTexts = tabs.map(tab => tab.title + ' ' + (tab.url || ''));
-    const embeddings = await currentModel.embed(tabTexts);
-    
-    // Convert embeddings to array for clustering
-    const vectors = await embeddings.array();
-    
-    // Simple clustering based on cosine similarity
-    const groups: { [key: string]: number[] } = {};
-    const threshold = 0.7;
-
-    for (let i = 0; i < vectors.length; i++) {
-      let assigned = false;
-      for (const groupId in groups) {
-        const groupVectors = groups[groupId].map(idx => vectors[idx]);
-        const similarity = cosineSimilarity(vectors[i], groupVectors[0]);
-        if (similarity > threshold) {
-          groups[groupId].push(i);
-          assigned = true;
-          break;
-        }
-      }
-      if (!assigned) {
-        groups[`group_${Object.keys(groups).length + 1}`] = [i];
-      }
-    }
-
-    return groups;
-  } catch (error: any) {
-    console.error('Error processing tab groups:', error);
-    throw new Error(error.message || 'Failed to process tab groups');
-  }
+interface Tab {
+  id?: number;
+  title?: string;
+  url?: string;
+  favIconUrl?: string;
 }
 
-// Helper function to calculate cosine similarity
-function cosineSimilarity(a: number[], b: number[]): number {
-  const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
-  const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
-  const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
-  return dotProduct / (magnitudeA * magnitudeB);
+// Simple text similarity function using Levenshtein distance
+function similarity(s1: string, s2: string): number {
+  const longer = s1.length > s2.length ? s1 : s2;
+  const shorter = s1.length > s2.length ? s2 : s1;
+  
+  if (longer.length === 0) {
+    return 1.0;
+  }
+  
+  const costs: number[] = [];
+  for (let i = 0; i <= shorter.length; i++) {
+    let lastValue = i;
+    for (let j = 0; j <= longer.length; j++) {
+      if (i === 0) {
+        costs[j] = j;
+      } else if (j > 0) {
+        let newValue = costs[j - 1];
+        if (shorter[i - 1] !== longer[j - 1]) {
+          newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+        }
+        costs[j - 1] = lastValue;
+        lastValue = newValue;
+      }
+    }
+    if (i > 0) {
+      costs[longer.length] = lastValue;
+    }
+  }
+  return (longer.length - costs[longer.length - 1]) / longer.length;
+}
+
+// Process tabs and group them
+function processTabGroups(tabs: chrome.tabs.Tab[]) {
+  const groups: { [key: string]: number[] } = {};
+  const threshold = 0.3; // Similarity threshold
+
+  for (let i = 0; i < tabs.length; i++) {
+    let assigned = false;
+    const tabText = (tabs[i].title || '') + ' ' + (tabs[i].url || '');
+    
+    for (const groupId in groups) {
+      const groupTabs = groups[groupId].map(idx => tabs[idx]);
+      const groupText = (groupTabs[0].title || '') + ' ' + (groupTabs[0].url || '');
+      const sim = similarity(tabText.toLowerCase(), groupText.toLowerCase());
+      
+      if (sim > threshold) {
+        groups[groupId].push(i);
+        assigned = true;
+        break;
+      }
+    }
+    
+    if (!assigned) {
+      groups[`group_${Object.keys(groups).length + 1}`] = [i];
+    }
+  }
+
+  return groups;
 }
 
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'ANALYZE_TABS') {
-    chrome.tabs.query({ currentWindow: true }, async (tabs) => {
+    chrome.tabs.query({ currentWindow: true }, (tabs) => {
       try {
-        const groups = await processTabGroups(tabs);
+        const groups = processTabGroups(tabs);
         sendResponse({ success: true, groups });
       } catch (error: any) {
         console.error('Error in tab analysis:', error);

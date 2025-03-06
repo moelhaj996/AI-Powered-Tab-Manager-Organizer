@@ -2,6 +2,35 @@
 
 A Chrome extension that uses AI to intelligently organize and manage your browser tabs.
 
+## Project Architecture
+
+```mermaid
+graph TD
+    subgraph Chrome Extension
+        P[Popup] --> |User Interface| R[React Components]
+        R --> |State Management| S[Tab State]
+        R --> |User Actions| M[Message Bus]
+        
+        subgraph Background Service
+            B[Background Script] --> |Tab Analysis| T[TensorFlow.js]
+            B --> |Group Management| G[Tab Groups]
+            B --> |Message Handling| M
+        end
+        
+        subgraph Content Scripts
+            C[Content Script] --> |Page Analysis| E[Content Extractor]
+            C --> |Message Bus| M
+        end
+        
+        M --> |Tab Data| B
+        M --> |Group Updates| P
+    end
+    
+    style Chrome Extension fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style Background Service fill:#e6f3ff,stroke:#333,stroke-width:2px
+    style Content Scripts fill:#fff2e6,stroke:#333,stroke-width:2px
+```
+
 ## Features
 
 - Automatic tab grouping using AI/NLP
@@ -42,6 +71,37 @@ npm run watch
 
 - The extension will automatically rebuild when you make changes
 - Refresh the extension in Chrome to see your changes
+
+## Project Structure
+
+```mermaid
+graph LR
+    subgraph Project Files
+        M[manifest.json] --> |Configuration| W[webpack.config.js]
+        W --> |Builds| D[dist/]
+        
+        subgraph Source Code
+            S[src/] --> P[popup/]
+            S --> B[background/]
+            S --> C[content/]
+            S --> T[types/]
+            
+            P --> |React| UI[UI Components]
+            B --> |Service Worker| BG[Background Process]
+            C --> |Page Analysis| CS[Content Scripts]
+            T --> |TypeScript| TD[Type Definitions]
+        end
+        
+        subgraph Assets
+            A[assets/] --> I[Icons]
+            A --> S[Styles]
+        end
+    end
+    
+    style Project Files fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style Source Code fill:#e6f3ff,stroke:#333,stroke-width:2px
+    style Assets fill:#fff2e6,stroke:#333,stroke-width:2px
+```
 
 ## Usage
 

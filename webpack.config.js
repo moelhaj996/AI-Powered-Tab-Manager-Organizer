@@ -12,7 +12,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]/[name].js',
+    filename: '[name].js',
     clean: true
   },
   module: {
@@ -29,12 +29,25 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js'],
+    fallback: {
+      "crypto": false,
+      "fs": false,
+      "path": false,
+      "os": false
+    }
+  },
+  optimization: {
+    splitChunks: {
+      chunks(chunk) {
+        return chunk.name !== 'background';
+      }
+    }
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/popup/popup.html',
-      filename: 'popup/popup.html',
+      filename: 'popup.html',
       chunks: ['popup']
     }),
     new CopyPlugin({
