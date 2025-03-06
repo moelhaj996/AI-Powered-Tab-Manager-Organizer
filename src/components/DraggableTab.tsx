@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import type { Identifier } from 'dnd-core';
 import { useDrag, useDrop } from 'react-dnd/dist/hooks';
+import type { DragSourceMonitor, DropTargetMonitor, Identifier } from 'react-dnd';
 import { Tab } from '../types';
 
 interface DraggableTabProps {
@@ -14,11 +14,12 @@ interface DraggableTabProps {
 }
 
 interface DragItem {
-  type: 'TAB';
+  type: string;
   id: number;
   groupId: string;
   index: number;
   windowId: number;
+  tabId?: number;
 }
 
 export const DraggableTab: React.FC<DraggableTabProps> = ({
@@ -32,34 +33,34 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
 }) => {
   const [showWindowDropdown, setShowWindowDropdown] = useState(false);
 
-  const [{ isDragging }, drag] = useDrag<DragItem, void, { isDragging: boolean }>({
+  const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>({
     type: 'TAB',
-    item: { type: 'TAB', id: tab.id!, groupId, index, windowId: tab.windowId! },
+    item: { 
+      type: 'TAB', 
+      id: tab.id!, 
+      groupId, 
+      index, 
+      windowId: tab.windowId!,
+      tabId: tab.id 
+    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
-    end: (item, monitor) => {
-      const dropResult = monitor.getDropResult<{ windowId?: number }>();
-      if (dropResult && dropResult.windowId && dropResult.windowId !== tab.windowId) {
-        onTabAction({
-          type: 'MOVE',
-          tabId: tab.id,
-          targetWindowId: dropResult.windowId,
-          targetIndex: -1
-        });
-      }
-    },
   });
 
-  const [{ isOver }, drop] = useDrop<DragItem, { windowId?: number }, { isOver: boolean }>({
+  const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>({
     accept: 'TAB',
-    hover(item, monitor) {
-      if (!tab.id) return;
-      if (item.id === tab.id) return;
-      if (item.windowId !== tab.windowId) return;
-
-      onTabMove(item.index, index, groupId);
-      item.index = index;
+    drop: (item) => {
+      if (item.windowId !== tab.windowId) {
+        onTabAction({
+          type: 'MOVE',
+          tabId: item.id,
+          targetWindowId: tab.windowId,
+          targetIndex: index
+        });
+      } else if (item.index !== index) {
+        onTabMove(item.index, index, groupId);
+      }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -69,27 +70,25 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
   return (
     <div
       ref={(node) => drag(drop(node))}
-      style={{ animationDelay: `${index * 50}ms` }}
       className={`
-        group px-4 py-3 bg-white hover:bg-gray-50 transition-all duration-200
-        animate-slideUp transform hover:translate-x-1
-        ${isDragging ? 'opacity-50 bg-blue-50 scale-95' : ''}
-        ${isOver ? 'border-t-2 border-blue-500 translate-y-1' : ''}
+        group px-4 py-3 bg-white hover:bg-gray-50
+        ${isDragging ? 'opacity-50 bg-blue-50' : ''}
+        ${isOver ? 'border-t-2 border-blue-500' : ''}
       `}
     >
       <div className="flex items-center space-x-3">
-        {/* Drag Handle with Window Dropdown */}
+        {/* Drag Handle */}
         <div 
-          className="relative flex-shrink-0 cursor-move text-gray-400 hover:text-gray-600 transition-colors duration-200"
+          className="relative flex-shrink-0 cursor-move text-gray-400 hover:text-gray-600"
           onMouseEnter={() => setShowWindowDropdown(true)}
           onMouseLeave={() => setShowWindowDropdown(false)}
         >
-          <svg className="w-5 h-5 transform group-hover:rotate-12 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
           </svg>
           
           {showWindowDropdown && (
-            <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-30 border border-gray-100 animate-fadeIn">
+            <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-30 border border-gray-100">
               {windows.map((window, index) => (
                 window.id !== tab.windowId && (
                   <button
@@ -104,7 +103,7 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
                       });
                       setShowWindowDropdown(false);
                     }}
-                    className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                    className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600"
                   >
                     Move to Window {index + 1}
                     {window.focused ? ' (Current)' : ''}
@@ -116,18 +115,18 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
         </div>
 
         {/* Favicon */}
-        <div className="flex-shrink-0 w-5 h-5 transition-transform duration-200 transform group-hover:scale-110">
+        <div className="flex-shrink-0 w-5 h-5">
           {tab.favIconUrl ? (
             <img
               src={tab.favIconUrl}
               alt=""
-              className="w-full h-full object-contain rounded-sm transition-all duration-200 hover:shadow-lg"
+              className="w-full h-full object-contain rounded-sm"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
           ) : (
-            <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center transition-colors duration-200 hover:bg-gray-300">
+            <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
               <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
@@ -136,9 +135,9 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
         </div>
 
         {/* Tab Title */}
-        <div className="flex-1 min-w-0 transition-transform duration-200 transform group-hover:translate-x-1">
+        <div className="flex-1 min-w-0">
           <button
-            className="text-left w-full truncate text-gray-900 hover:text-blue-600 focus:outline-none focus:text-blue-600 transition-colors duration-200"
+            className="text-left w-full truncate text-gray-900 hover:text-blue-600 focus:outline-none focus:text-blue-600"
             onClick={(e) => {
               e.stopPropagation();
               tab.id && onTabClick(tab.id);
@@ -150,18 +149,18 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex-shrink-0 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
+        <div className="flex-shrink-0 flex items-center space-x-1 opacity-0 group-hover:opacity-100">
           {/* Pin/Unpin Button */}
           <button
             onClick={() => tab.id && onTabAction({ type: tab.pinned ? 'UNPIN' : 'PIN', tabId: tab.id })}
-            className={`p-1.5 rounded-full transition-all duration-200 transform hover:scale-110 ${
+            className={`p-1.5 rounded-full ${
               tab.pinned
                 ? 'text-blue-600 hover:bg-blue-50'
                 : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
             }`}
             title={tab.pinned ? "Unpin tab" : "Pin tab"}
           >
-            <svg className="w-4 h-4 transform transition-transform duration-200 hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -174,10 +173,10 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
           {/* Close Button */}
           <button
             onClick={() => tab.id && onTabAction({ type: 'CLOSE', tabId: tab.id })}
-            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 transform hover:scale-110"
+            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full"
             title="Close tab"
           >
-            <svg className="w-4 h-4 transform transition-transform duration-200 hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
