@@ -87,7 +87,7 @@
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "" + chunkId + ".js";
+/******/ 			return "chunks/chunk-" + {"vendor-tensorflow":"dd87b09fad48299da037","vendor-long":"f5c6ebf58a812d8f30e6","vendor-seedrandom":"0847627fe7ccb7922026","commons":"92806dc8ea44a2de5807","_16a5-_0991-_a08f-_934a-_ef5c":"ebc92b5733231ca6ea41","vendor-tensorflow-models":"5443d929eadb02bfc1dd","_9a43-_f551":"2ce1c10d2cc4cb71d8f9"}[chunkId] + ".js";
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -296,8 +296,8 @@ var __webpack_exports__ = {};
 // Initialize TensorFlow.js
 async function initTensorFlow() {
     try {
-        const tf = await Promise.all(/*! import() */[__webpack_require__.e("vendors-node_modules_long_src_long_js-node_modules_seedrandom_index_js"), __webpack_require__.e("vendors-node_modules_tensorflow_tfjs_dist_index_js"), __webpack_require__.e("_16a5-_0991-_a08f-_934a-_ef5c-_d4c0")]).then(__webpack_require__.bind(__webpack_require__, /*! @tensorflow/tfjs */ "./node_modules/@tensorflow/tfjs/dist/index.js"));
-        const { load } = await Promise.all(/*! import() */[__webpack_require__.e("vendors-node_modules_long_src_long_js-node_modules_seedrandom_index_js"), __webpack_require__.e("vendors-node_modules_tensorflow-models_universal-sentence-encoder_dist_universal-sentence-enc-1608fa"), __webpack_require__.e("_9a43-_f551-_d4c0")]).then(__webpack_require__.bind(__webpack_require__, /*! @tensorflow-models/universal-sentence-encoder */ "./node_modules/@tensorflow-models/universal-sentence-encoder/dist/universal-sentence-encoder.esm.js"));
+        const tf = await Promise.all(/*! import() */[__webpack_require__.e("vendor-tensorflow"), __webpack_require__.e("vendor-long"), __webpack_require__.e("vendor-seedrandom"), __webpack_require__.e("commons"), __webpack_require__.e("_16a5-_0991-_a08f-_934a-_ef5c")]).then(__webpack_require__.bind(__webpack_require__, /*! @tensorflow/tfjs */ "./node_modules/@tensorflow/tfjs/dist/index.js"));
+        const { load } = await Promise.all(/*! import() */[__webpack_require__.e("vendor-tensorflow"), __webpack_require__.e("vendor-long"), __webpack_require__.e("vendor-seedrandom"), __webpack_require__.e("vendor-tensorflow-models"), __webpack_require__.e("commons"), __webpack_require__.e("_9a43-_f551")]).then(__webpack_require__.bind(__webpack_require__, /*! @tensorflow-models/universal-sentence-encoder */ "./node_modules/@tensorflow-models/universal-sentence-encoder/dist/universal-sentence-encoder.esm.js"));
         return { tf, load };
     }
     catch (error) {
@@ -389,7 +389,10 @@ function processTabGroups(tabs) {
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === 'ANALYZE_TABS') {
-        chrome.tabs.query({ currentWindow: true }, (tabs) => {
+        const queryOptions = request.windowId
+            ? { windowId: request.windowId }
+            : {};
+        chrome.tabs.query(queryOptions, (tabs) => {
             try {
                 const groups = processTabGroups(tabs);
                 sendResponse({ success: true, groups });

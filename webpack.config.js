@@ -13,6 +13,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
+    chunkFilename: 'chunks/chunk-[contenthash].js',
     clean: true
   },
   module: {
@@ -39,8 +40,22 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
-      chunks(chunk) {
-        return chunk.name !== 'background';
+      chunks: 'all',
+      maxInitialRequests: Infinity,
+      minSize: 0,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name(module) {
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            return `vendor-${packageName.replace('@', '')}`;
+          }
+        },
+        commons: {
+          name: 'commons',
+          minChunks: 2,
+          priority: -20
+        }
       }
     }
   },

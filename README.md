@@ -2,33 +2,65 @@
 
 A Chrome extension that uses AI to intelligently organize and manage your browser tabs.
 
-## Project Architecture
+## Project Structure
 
 ```mermaid
 graph TD
-    subgraph Chrome Extension
-        P[Popup] --> |User Interface| R[React Components]
-        R --> |State Management| S[Tab State]
-        R --> |User Actions| M[Message Bus]
+    subgraph Extension Structure
+        M[manifest.json] --> |Configures| EXT[Chrome Extension]
         
-        subgraph Background Service
-            B[Background Script] --> |Tab Analysis| T[TensorFlow.js]
-            B --> |Group Management| G[Tab Groups]
-            B --> |Message Handling| M
+        subgraph Source Code
+            SRC[src/] --> POP[popup/]
+            SRC --> BG[background/]
+            SRC --> CON[content/]
+            SRC --> TYP[types/]
+
+            %% Popup Details
+            POP --> |React Entry| IDX[index.tsx]
+            POP --> |Main Component| PC[Popup.tsx]
+            POP --> |Styles| CSS[index.css]
+            
+            %% Background Service
+            BG --> |Service Worker| BS[background.ts]
+            BS --> |Uses| TF[TensorFlow.js]
+            BS --> |Handles| TG[Tab Grouping]
+            
+            %% Content Scripts
+            CON --> |Page Analysis| CS[content.ts]
+            
+            %% Types
+            TYP --> |Interfaces| TI[index.ts]
+            TYP --> |Chrome Types| CT[chrome.d.ts]
         end
-        
-        subgraph Content Scripts
-            C[Content Script] --> |Page Analysis| E[Content Extractor]
-            C --> |Message Bus| M
+
+        subgraph Build System
+            WP[webpack.config.js] --> |Builds| DIST[dist/]
+            PC[postcss.config.js] --> |Processes| CSS
+            TC[tailwind.config.js] --> |Styles| CSS
         end
-        
-        M --> |Tab Data| B
-        M --> |Group Updates| P
+
+        subgraph Assets
+            AST[assets/] --> IC16[icon16.png]
+            AST --> IC48[icon48.png]
+            AST --> IC128[icon128.png]
+        end
+
+        %% Dependencies
+        PKG[package.json] --> |Manages| DEP[Dependencies]
+        DEP --> |UI| REACT[React]
+        DEP --> |AI| TFJS[TensorFlow.js]
+        DEP --> |Styling| TWC[Tailwind CSS]
+
+        %% Communication Flow
+        PC <--> |Messages| BS
+        CS <--> |Content Info| BS
+        BS --> |Groups| PC
     end
-    
-    style Chrome Extension fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style Background Service fill:#e6f3ff,stroke:#333,stroke-width:2px
-    style Content Scripts fill:#fff2e6,stroke:#333,stroke-width:2px
+
+    style Extension Structure fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style Source Code fill:#e6f3ff,stroke:#333,stroke-width:2px
+    style Build System fill:#fff2e6,stroke:#333,stroke-width:2px
+    style Assets fill:#e6ffe6,stroke:#333,stroke-width:2px
 ```
 
 ## Features
@@ -72,37 +104,6 @@ npm run watch
 - The extension will automatically rebuild when you make changes
 - Refresh the extension in Chrome to see your changes
 
-## Project Structure
-
-```mermaid
-graph LR
-    subgraph Project Files
-        M[manifest.json] --> |Configuration| W[webpack.config.js]
-        W --> |Builds| D[dist/]
-        
-        subgraph Source Code
-            S[src/] --> P[popup/]
-            S --> B[background/]
-            S --> C[content/]
-            S --> T[types/]
-            
-            P --> |React| UI[UI Components]
-            B --> |Service Worker| BG[Background Process]
-            C --> |Page Analysis| CS[Content Scripts]
-            T --> |TypeScript| TD[Type Definitions]
-        end
-        
-        subgraph Assets
-            A[assets/] --> I[Icons]
-            A --> S[Styles]
-        end
-    end
-    
-    style Project Files fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style Source Code fill:#e6f3ff,stroke:#333,stroke-width:2px
-    style Assets fill:#fff2e6,stroke:#333,stroke-width:2px
-```
-
 ## Usage
 
 1. Click the extension icon in your Chrome toolbar
@@ -121,4 +122,4 @@ graph LR
 
 ## License
 
-MIT 
+MIT

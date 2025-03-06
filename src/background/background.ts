@@ -46,6 +46,7 @@ interface Tab {
   title?: string;
   url?: string;
   favIconUrl?: string;
+  windowId?: number;
 }
 
 // Simple text similarity function using Levenshtein distance
@@ -111,7 +112,11 @@ function processTabGroups(tabs: chrome.tabs.Tab[]) {
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'ANALYZE_TABS') {
-    chrome.tabs.query({ currentWindow: true }, (tabs) => {
+    const queryOptions: chrome.tabs.QueryInfo = request.windowId 
+      ? { windowId: request.windowId }
+      : {};
+
+    chrome.tabs.query(queryOptions, (tabs) => {
       try {
         const groups = processTabGroups(tabs);
         sendResponse({ success: true, groups });
