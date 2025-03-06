@@ -1,5 +1,6 @@
 import React from 'react';
-import { useDrag, useDrop, DragSourceMonitor, DropTargetMonitor } from 'react-dnd';
+import type { Identifier } from 'dnd-core';
+import { useDrag, useDrop } from 'react-dnd/dist/hooks';
 import { Tab } from '../types';
 
 interface DraggableTabProps {
@@ -12,7 +13,7 @@ interface DraggableTabProps {
 }
 
 interface DragItem {
-  type: string;
+  type: 'TAB';
   id: number;
   groupId: string;
   index: number;
@@ -26,24 +27,24 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
   onTabAction,
   onTabMove,
 }) => {
-  const [{ isDragging }, drag] = useDrag({
+  const [{ isDragging }, drag] = useDrag<DragItem, void, { isDragging: boolean }>({
     type: 'TAB',
-    item: { type: 'TAB', id: tab.id, groupId, index },
-    collect: (monitor: DragSourceMonitor) => ({
+    item: { type: 'TAB', id: tab.id!, groupId, index },
+    collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });
 
   const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>({
     accept: 'TAB',
-    hover(item: DragItem, monitor: DropTargetMonitor) {
+    hover(item, monitor) {
       if (!tab.id) return;
       if (item.id === tab.id) return;
 
       onTabMove(item.index, index, groupId);
       item.index = index;
     },
-    collect: (monitor: DropTargetMonitor) => ({
+    collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
   });

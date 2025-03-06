@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Tab, TabGroup, Window, TabAction } from '../types';
-import { DndProvider } from 'react-dnd';
+import { DndProvider } from 'react-dnd/dist/core';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DraggableTab } from '../components/DraggableTab';
+import icon48 from '../assets/icon48.png';
 
 interface Group {
   id: string;
@@ -249,7 +250,7 @@ const Popup: React.FC = () => {
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 shadow-lg">
           <div className="flex items-center space-x-3">
-            <img src="../assets/icon48.png" alt="AI Tab Manager" className="w-8 h-8" />
+            <img src={icon48} alt="AI Tab Manager" className="w-8 h-8" />
             <h1 className="text-2xl font-bold">AI Tab Manager</h1>
           </div>
           <p className="text-blue-100 text-sm mt-1">Intelligent tab organization</p>
