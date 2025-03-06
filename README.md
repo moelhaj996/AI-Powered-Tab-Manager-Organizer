@@ -1,10 +1,10 @@
-# Mohaj AI - Intelligent Tab Management System
+# Mohaj AI - Smart Tab Management System
 
 ## System Architecture
 
 ```mermaid
 graph TD
-    subgraph Mohaj_AI[Mohaj AI Tab Manager]
+    subgraph Mohaj_AI[Mohaj AI]
         A[Chrome Extension] --> B[Popup Interface]
         
         subgraph Core_Components[Core Components]
@@ -83,77 +83,68 @@ graph TD
 
 ```mermaid
 graph TD
-    subgraph Extension Structure
+    subgraph Mohaj_AI_Structure[Mohaj AI Structure]
         M[manifest.json] --> |Configures| EXT[Chrome Extension]
         
-        subgraph Source Code
+        subgraph Source_Code[Source Code]
             SRC[src/] --> POP[popup/]
             SRC --> BG[background/]
             SRC --> CON[content/]
             SRC --> TYP[types/]
 
-            %% Popup Details
             POP --> |React Entry| IDX[index.tsx]
             POP --> |Main Component| PC[Popup.tsx]
             POP --> |Styles| CSS[index.css]
             
-            %% Background Service
             BG --> |Service Worker| BS[background.ts]
-            BS --> |Uses| TF[TensorFlow.js]
-            BS --> |Handles| TG[Tab Grouping]
             
-            %% Content Scripts
             CON --> |Page Analysis| CS[content.ts]
             
-            %% Types
             TYP --> |Interfaces| TI[index.ts]
             TYP --> |Chrome Types| CT[chrome.d.ts]
         end
 
-        subgraph Build System
+        subgraph Build_System[Build System]
             WP[webpack.config.js] --> |Builds| DIST[dist/]
             PC[postcss.config.js] --> |Processes| CSS
             TC[tailwind.config.js] --> |Styles| CSS
         end
 
-        subgraph Assets
+        subgraph Assets[Assets]
             AST[assets/] --> IC16[icon16.png]
             AST --> IC48[icon48.png]
             AST --> IC128[icon128.png]
         end
 
-        %% Dependencies
         PKG[package.json] --> |Manages| DEP[Dependencies]
         DEP --> |UI| REACT[React]
-        DEP --> |AI| TFJS[TensorFlow.js]
         DEP --> |Styling| TWC[Tailwind CSS]
 
-        %% Communication Flow
         PC <--> |Messages| BS
         CS <--> |Content Info| BS
-        BS --> |Groups| PC
     end
 
-    style Extension Structure fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style Source Code fill:#e6f3ff,stroke:#333,stroke-width:2px
-    style Build System fill:#fff2e6,stroke:#333,stroke-width:2px
+    style Mohaj_AI_Structure fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style Source_Code fill:#e6f3ff,stroke:#333,stroke-width:2px
+    style Build_System fill:#fff2e6,stroke:#333,stroke-width:2px
     style Assets fill:#e6ffe6,stroke:#333,stroke-width:2px
 ```
 
 ## Features
 
-- Automatic tab grouping using AI/NLP
-- Content summarization for tab groups
-- Session management
-- Customizable grouping options
+- Efficient window and tab management
+- Drag and drop tab organization
+- Multi-window support
+- Tab pinning and reordering
 - Visual tab organization
+- Intuitive user interface
 
 ## Installation
 
-1. Clone this repository:
+1. Clone the Mohaj AI repository:
 ```bash
-git clone https://github.com/yourusername/ai-tab-manager.git
-cd ai-tab-manager
+git clone https://github.com/yourusername/mohaj-ai.git
+cd mohaj-ai
 ```
 
 2. Install dependencies:
@@ -183,18 +174,18 @@ npm run watch
 
 ## Usage
 
-1. Click the extension icon in your Chrome toolbar
-2. Click "Analyze Tabs" to automatically group your open tabs
-3. View and manage your tab groups
-4. Save sessions for later use
-5. Customize grouping settings as needed
+1. Click the Mohaj AI icon in your Chrome toolbar
+2. Select a window from the dropdown to view its tabs
+3. Drag and drop tabs between windows using the drop zones
+4. Use the pin/unpin and close buttons to manage tabs
+5. Create new windows as needed
 
 ## Technologies Used
 
 - React
 - TypeScript
-- TensorFlow.js
 - Chrome Extensions API
+- React DnD
 - Tailwind CSS
 
 ## License
