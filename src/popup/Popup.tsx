@@ -321,8 +321,8 @@ const Popup: React.FC = () => {
         
         {/* Main Content */}
         <div className="p-4 space-y-4">
-          {/* Window Management */}
-          <div className="bg-white rounded-lg shadow-sm p-4 space-y-2">
+          {/* Window Selection */}
+          <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center justify-between">
               <select
                 className="flex-1 p-2 border border-gray-200 rounded-lg mr-2 bg-white hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
@@ -346,18 +346,6 @@ const Popup: React.FC = () => {
                 <span>New</span>
               </button>
             </div>
-
-            {/* Window Drop Zones */}
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {windows.map((window, index) => (
-                <WindowDropZone
-                  key={window.id}
-                  window={window}
-                  index={index}
-                  onDrop={(tabId) => handleWindowDrop(window.id, tabId)}
-                />
-              ))}
-            </div>
           </div>
 
           {error && (
@@ -371,6 +359,31 @@ const Popup: React.FC = () => {
                 <div className="ml-3">
                   <p className="text-sm text-red-700">{error}</p>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Current Window Tabs */}
+          {selectedWindow !== 'all' && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-4">
+              <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
+                <h3 className="font-medium text-gray-900">
+                  Current Window Tabs ({filteredTabs.length})
+                </h3>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {filteredTabs.map((tab, index) => (
+                  <DraggableTab
+                    key={tab.id}
+                    tab={tab}
+                    index={index}
+                    groupId="current"
+                    windows={windowsForDraggable}
+                    onTabClick={handleTabClick}
+                    onTabAction={handleTabAction}
+                    onTabMove={handleTabMove}
+                  />
+                ))}
               </div>
             </div>
           )}
