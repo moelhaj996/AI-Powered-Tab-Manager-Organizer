@@ -86,7 +86,13 @@ const Popup: React.FC = () => {
     refreshTabs();
   }, [refreshTabs]);
 
-  // Filter tabs based on selected window
+  // Filter tabs based on selected window and get current window tabs
+  const currentWindowTabs = useMemo(() => {
+    const currentWindow = windows.find(w => w.focused);
+    return currentWindow ? tabs.filter(tab => tab.windowId === currentWindow.id) : [];
+  }, [tabs, windows]);
+
+  // Filter tabs based on selected window (for groups)
   const filteredTabs = useMemo(() => {
     if (selectedWindow === 'all') {
       return tabs;
@@ -380,11 +386,11 @@ const Popup: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-4">
             <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
               <h3 className="font-medium text-gray-900">
-                Current Window Tabs ({filteredTabs.length})
+                Current Window Tabs ({currentWindowTabs.length})
               </h3>
             </div>
             <div className="divide-y divide-gray-100">
-              {filteredTabs.map((tab, index) => (
+              {currentWindowTabs.map((tab, index) => (
                 <DraggableTab
                   key={tab.id}
                   tab={tab}
