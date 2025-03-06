@@ -48,21 +48,24 @@ flowchart LR
     end
     
     %% Styling
-    classDef default fill:white,stroke:#000,stroke-width:1px
-    classDef container fill:none,stroke:#000,stroke-width:1px
-    classDef start fill:none,stroke:#000,stroke-width:2px,stroke-dasharray: 5 5
+    classDef default fill:#f8fafc,stroke:#475569,stroke-width:1px
+    classDef container fill:#f1f5f9,stroke:#475569,stroke-width:1px
+    classDef start fill:#f1f5f9,stroke:#3b82f6,stroke-width:2px,stroke-dasharray: 5 5
     
     %% Apply styles
     class Start start
     class Process,UI,Ops,State container
     
-    %% Node styles
-    style Manager fill:white,stroke:#000,stroke-width:1px
+    %% Node styles - Enhanced colors for better visibility
+    style Manager fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
     style Actions fill:none,stroke:none
-    style Select,Drag,Operate fill:white,stroke:#000,stroke-width:1px
-    style Move,Order,Pin,Close fill:white,stroke:#000,stroke-width:1px
-    style Update,Refresh fill:white,stroke:#000,stroke-width:1px
-    style Init,Windows,Tabs fill:white,stroke:#000,stroke-width:1px
+    style Select,Drag,Operate fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+    style Move,Order,Pin,Close fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+    style Update,Refresh fill:#ecfdf5,stroke:#059669,stroke-width:1px
+    style Init,Windows,Tabs fill:#faf5ff,stroke:#7c3aed,stroke-width:1px
+
+    %% Link styles
+    linkStyle default stroke:#64748b,stroke-width:1px
 ```
 
 ## Features
