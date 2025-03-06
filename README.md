@@ -1,5 +1,85 @@
 # AI - Smart Tab Management System
 
+## Main Process Flow
+
+```mermaid
+%%{init: { 
+    'theme': 'dark',
+    'themeVariables': {
+        'background': '#0D1117',
+        'primaryColor': '#ffffff',
+        'primaryTextColor': '#ffffff',
+        'primaryBorderColor': '#ffffff',
+        'lineColor': '#ffffff',
+        'secondaryColor': '#1f2937',
+        'tertiaryColor': '#374151'
+    }
+}}%%
+flowchart LR
+    %% Main Process Container
+    subgraph Process[" AI Process "]
+        direction TB
+        
+        %% Core Flow
+        Start((Start)) --> Init["Initialize"]
+        Init --> Windows["Load Windows"]
+        Windows --> Tabs["Load Tabs"]
+        
+        %% Interface Layer
+        subgraph UI[" Interface "]
+            direction LR
+            Manager["Window Manager"] --> Actions
+            subgraph Actions
+                direction TB
+                Select["Select Window"] 
+                Drag["Drag & Drop"]
+                Operate["Tab Actions"]
+            end
+        end
+        
+        %% Operations Layer
+        subgraph Ops[" Operations "]
+            direction TB
+            Move["Move Tabs"]
+            Order["Reorder"]
+            Pin["Pin/Unpin"]
+            Close["Close"]
+        end
+        
+        %% State Layer
+        subgraph State[" State "]
+            direction LR
+            Update["Update"] --> Refresh["Refresh UI"]
+        end
+        
+        %% Connections
+        Tabs --> Manager
+        Actions --> Ops
+        Ops --> Update
+        Refresh --> Manager
+    end
+    
+    %% Styling
+    classDef default fill:#1f2937,stroke:#ffffff,stroke-width:1px,color:#ffffff
+    classDef container fill:#0D1117,stroke:#ffffff,stroke-width:1px,color:#ffffff
+    classDef start fill:none,stroke:#ffffff,stroke-width:2px,stroke-dasharray:5 5,color:#ffffff
+    
+    %% Apply styles
+    class Start start
+    class Process,UI,Ops,State container
+    
+    %% Node styles - Dark theme with high contrast
+    style Manager fill:#1f2937,stroke:#ffffff,stroke-width:1px,color:#ffffff
+    style Actions fill:none,stroke:none,color:#ffffff
+    style Select,Drag,Operate fill:#1f2937,stroke:#ffffff,stroke-width:1px,color:#ffffff
+    style Move,Order,Pin,Close fill:#1f2937,stroke:#ffffff,stroke-width:1px,color:#ffffff
+    style Update,Refresh fill:#1f2937,stroke:#ffffff,stroke-width:1px,color:#ffffff
+    style Init,Windows,Tabs fill:#1f2937,stroke:#ffffff,stroke-width:1px,color:#ffffff
+
+    %% Link styles
+    linkStyle default stroke:#ffffff,stroke-width:1px
+```
+
 ## Features
 
 - Efficient window and tab management
