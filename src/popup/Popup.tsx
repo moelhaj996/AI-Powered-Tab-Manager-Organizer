@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Tab, TabGroup, Window, TabAction } from '../types';
+import { Tab, Window, TabAction } from '../types';
 import { DndProvider } from 'react-dnd/dist/core';
 import { useDrop } from 'react-dnd/dist/hooks';
 import type { DropTargetMonitor } from 'react-dnd';
@@ -13,12 +13,6 @@ interface DragItem {
   groupId: string;
   index: number;
   windowId: number;
-}
-
-interface Group {
-  id: string;
-  tabs: Tab[];
-  summary: string;
 }
 
 const WindowDropZone: React.FC<{ window: Window; index: number; onDrop: (tabId: number) => void }> = ({ window, index, onDrop }) => {
@@ -54,12 +48,8 @@ const WindowDropZone: React.FC<{ window: Window; index: number; onDrop: (tabId: 
 const Popup: React.FC = () => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [windows, setWindows] = useState<Window[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedWindow, setSelectedWindow] = useState<string>('all');
-  const [showMoveMenu, setShowMoveMenu] = useState<string | null>(null);
-  const [isDraggingTab, setIsDraggingTab] = useState(false);
 
   const refreshTabs = useCallback(() => {
     chrome.windows.getAll({ populate: true }, (chromeWindows) => {
@@ -86,13 +76,7 @@ const Popup: React.FC = () => {
     refreshTabs();
   }, [refreshTabs]);
 
-  // Filter tabs based on selected window and get current window tabs
-  const currentWindowTabs = useMemo(() => {
-    const currentWindow = windows.find(w => w.focused);
-    return currentWindow ? tabs.filter(tab => tab.windowId === currentWindow.id) : [];
-  }, [tabs, windows]);
-
-  // Filter tabs based on selected window (for groups)
+  // Filter tabs based on selected window
   const filteredTabs = useMemo(() => {
     if (selectedWindow === 'all') {
       return tabs;
@@ -100,74 +84,6 @@ const Popup: React.FC = () => {
     const windowId = parseInt(selectedWindow, 10);
     return tabs.filter(tab => tab.windowId === windowId);
   }, [tabs, selectedWindow]);
-
-  const handleCreateWindow = async (groupId: string) => {
-    try {
-      const groupTabs = groups.find(g => g.id === groupId)?.tabs || [];
-      const firstTab = groupTabs[0];
-      
-      if (!firstTab || !firstTab.id) {
-        console.error('No valid tabs in group');
-        return;
-      }
-
-      const newWindow = await chrome.windows.create({ tabId: firstTab.id });
-      if (!newWindow || !newWindow.id) {
-        console.error('Failed to create new window');
-        return;
-      }
-
-      const remainingTabs = groupTabs.slice(1);
-      for (const tab of remainingTabs) {
-        if (tab.id) {
-          await handleTabAction({
-            type: 'MOVE',
-            tabId: tab.id,
-            targetWindowId: newWindow.id,
-            targetIndex: -1
-          });
-        }
-      }
-
-      refreshTabs();
-      setGroups(prevGroups => prevGroups.filter(g => g.id !== groupId));
-      setShowMoveMenu(null);
-    } catch (err) {
-      console.error('Error creating new window:', err);
-    }
-  };
-
-  const handleMoveTab = async (tabId: number, targetWindowId: number) => {
-    try {
-      await chrome.tabs.move(tabId, { windowId: targetWindowId, index: -1 });
-      setShowMoveMenu(null);
-      refreshTabs();
-    } catch (err) {
-      console.error('Error moving tab:', err);
-      setError('Failed to move tab. Please try again.');
-    }
-  };
-
-  const handleMoveGroup = async (groupId: string, targetWindowId: number) => {
-    try {
-      const groupTabs = groups.find(g => g.id === groupId)?.tabs || [];
-      for (const tab of groupTabs) {
-        if (tab.id) {
-          await handleTabAction({
-            type: 'MOVE',
-            tabId: tab.id,
-            targetWindowId,
-            targetIndex: -1
-          });
-        }
-      }
-      refreshTabs();
-      setGroups(prevGroups => prevGroups.filter(g => g.id !== groupId));
-      setShowMoveMenu(null);
-    } catch (err) {
-      console.error('Error moving group:', err);
-    }
-  };
 
   const handleTabAction = async (action: TabAction) => {
     try {
@@ -179,10 +95,6 @@ const Popup: React.FC = () => {
         case 'CLOSE':
           await chrome.tabs.remove(action.tabId);
           setTabs(prevTabs => prevTabs.filter(tab => tab.id !== action.tabId));
-          setGroups(prevGroups => prevGroups.map(g => ({
-            ...g,
-            tabs: g.tabs.filter(tab => tab.id !== action.tabId)
-          })));
           break;
         case 'MOVE':
           if (action.targetWindowId) {
@@ -204,62 +116,6 @@ const Popup: React.FC = () => {
     }
   };
 
-  const handleAnalyzeTabs = async () => {
-    setIsAnalyzing(true);
-    setError(null);
-    setGroups([]); // Clear existing groups
-
-    try {
-      const response = await new Promise<{ groups: { [key: string]: number[] } }>((resolve) => {
-        chrome.runtime.sendMessage({ 
-          type: 'ANALYZE_TABS',
-          windowId: selectedWindow === 'all' ? undefined : selectedWindow,
-          tabs: filteredTabs // Pass filtered tabs to background script
-        }, resolve);
-      });
-
-      if (!response || !response.groups) {
-        throw new Error('Invalid response from tab analysis');
-      }
-
-      const tabGroups = Object.entries(response.groups).reduce((acc, [groupId, indices]) => {
-        acc.push({
-          id: groupId,
-          tabs: indices.map(index => filteredTabs[index]).filter(tab => tab),
-          summary: groupId
-        });
-        return acc;
-      }, [] as Group[]);
-
-      setGroups(tabGroups);
-    } catch (err) {
-      setError('Failed to analyze tabs. Please try again.');
-      console.error('Error analyzing tabs:', err);
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const handleCloseGroup = async (groupId: string) => {
-    const groupTabs = groups.find(g => g.id === groupId)?.tabs || [];
-    const tabIds = groupTabs.map(tab => tab.id).filter((id): id is number => id !== undefined);
-    
-    if (tabIds.length === 0) {
-      console.warn('No valid tab IDs found in group:', groupId);
-      return;
-    }
-
-    try {
-      await chrome.tabs.remove(tabIds);
-      setGroups(prevGroups => prevGroups.filter(g => g.id !== groupId));
-      setTabs(prevTabs => prevTabs.filter(tab => !tabIds.includes(tab.id!)));
-    } catch (err) {
-      console.error('Error closing group:', err);
-      setError('Failed to close tab group. Please try again.');
-      refreshTabs();
-    }
-  };
-
   const handleTabClick = useCallback(async (tabId: number) => {
     try {
       await chrome.tabs.update(tabId, { active: true });
@@ -275,20 +131,17 @@ const Popup: React.FC = () => {
 
   const handleWindowChange = (windowId: string) => {
     setSelectedWindow(windowId);
-    setGroups([]); // Clear groups when window selection changes
   };
 
-  const handleTabMove = (dragIndex: number, hoverIndex: number, groupId: string) => {
-    const updatedGroups = groups.map((group: Group) => {
-      if (group.id === groupId) {
-        const newTabs = [...group.tabs];
-        const [draggedTab] = newTabs.splice(dragIndex, 1);
-        newTabs.splice(hoverIndex, 0, draggedTab);
-        return { ...group, tabs: newTabs };
-      }
-      return group;
-    });
-    setGroups(updatedGroups);
+  const handleTabMove = (dragIndex: number, hoverIndex: number) => {
+    // Handle tab reordering within the same window
+    if (dragIndex !== hoverIndex) {
+      handleTabAction({
+        type: 'REORDER',
+        tabId: filteredTabs[dragIndex].id!,
+        targetIndex: hoverIndex
+      });
+    }
   };
 
   // Map windows to the format expected by DraggableTab
@@ -318,9 +171,9 @@ const Popup: React.FC = () => {
               className="w-8 h-8" 
             />
             <div>
-              <h1 className="text-2xl font-bold">AI Tab Manager</h1>
+              <h1 className="text-2xl font-bold">Tab Manager</h1>
               <p className="text-blue-100 text-sm mt-1">
-                Intelligent tab organization
+                Organize your tabs efficiently
               </p>
             </div>
           </div>
@@ -382,20 +235,20 @@ const Popup: React.FC = () => {
             </div>
           )}
 
-          {/* Current Window Tabs - Always shown */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-4">
+          {/* Window Tabs */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
             <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
               <h3 className="font-medium text-gray-900">
-                Current Window Tabs ({currentWindowTabs.length})
+                {selectedWindow === 'all' ? 'All Tabs' : 'Window Tabs'} ({filteredTabs.length})
               </h3>
             </div>
             <div className="divide-y divide-gray-100">
-              {currentWindowTabs.map((tab, index) => (
+              {filteredTabs.map((tab, index) => (
                 <DraggableTab
                   key={tab.id}
                   tab={tab}
                   index={index}
-                  groupId="current"
+                  groupId="window"
                   windows={windowsForDraggable}
                   onTabClick={handleTabClick}
                   onTabAction={handleTabAction}
@@ -403,129 +256,6 @@ const Popup: React.FC = () => {
                 />
               ))}
             </div>
-          </div>
-
-          {/* Tab Groups */}
-          <div className="space-y-4">
-            {groups.map((group) => (
-              <div
-                key={group.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
-              >
-                <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-gray-900 flex items-center space-x-2">
-                      <span>{group.summary}</span>
-                      <span className="text-sm text-gray-500">
-                        ({group.tabs.length} tabs)
-                      </span>
-                    </h3>
-                    <div className="flex items-center space-x-2">
-                      <div className="relative">
-                        <button
-                          onClick={() => setShowMoveMenu(prev => prev === group.id ? null : group.id)}
-                          className="text-gray-600 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50"
-                          title="Move group to window"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                          </svg>
-                        </button>
-                        {showMoveMenu === group.id && (
-                          <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-xl z-20 border border-gray-100">
-                            <button
-                              onClick={() => handleCreateWindow(group.id)}
-                              className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                              </svg>
-                              <span>Create New Window</span>
-                            </button>
-                            <div className="border-t border-gray-100 my-1"></div>
-                            {windows.map(window => {
-                              const isCurrentWindow = window.id.toString() === selectedWindow;
-                              return (
-                                <button
-                                  key={window.id}
-                                  onClick={() => handleMoveGroup(group.id, window.id)}
-                                  className={`w-full px-4 py-2 text-sm text-left ${
-                                    isCurrentWindow
-                                      ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
-                                      : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                                  }`}
-                                  disabled={isCurrentWindow}
-                                >
-                                  Window {windows.indexOf(window) + 1}
-                                  {window.focused ? ' (Current)' : ''}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => handleCloseGroup(group.id)}
-                        className="text-gray-600 hover:text-red-600 p-2 rounded-full hover:bg-red-50"
-                        title="Close all tabs in this group"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {group.tabs.map((tab, index) => (
-                    <DraggableTab
-                      key={tab.id}
-                      tab={tab}
-                      index={index}
-                      groupId={group.id}
-                      windows={windowsForDraggable}
-                      onTabClick={handleTabClick}
-                      onTabAction={handleTabAction}
-                      onTabMove={handleTabMove}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Analyze Button */}
-          <div className="sticky bottom-0 bg-white border-t border-gray-100 p-4 mt-auto">
-            <button
-              className={`w-full px-6 py-3 rounded-lg text-white font-medium shadow-sm ${
-                isAnalyzing
-                  ? 'bg-blue-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 hover:shadow-lg'
-              }`}
-              onClick={handleAnalyzeTabs}
-              disabled={isAnalyzing}
-            >
-              <div className="flex items-center justify-center space-x-2">
-                {isAnalyzing ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span>Analyzing...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    <span>
-                      Analyze {selectedWindow === 'all' ? 'All' : 'Window'} Tabs
-                    </span>
-                  </>
-                )}
-              </div>
-            </button>
           </div>
         </div>
       </div>
