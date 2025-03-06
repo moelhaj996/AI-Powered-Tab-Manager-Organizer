@@ -8,6 +8,7 @@ const Popup: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedWindow, setSelectedWindow] = useState<number | 'all'>('all');
+  const [showMoveMenu, setShowMoveMenu] = useState<number | null>(null);
 
   const refreshTabs = useCallback(() => {
     chrome.windows.getAll({ populate: true }, (chromeWindows) => {
@@ -41,6 +42,70 @@ const Popup: React.FC = () => {
     }
     return tabs.filter(tab => tab.windowId === selectedWindow);
   }, [tabs, selectedWindow]);
+
+  const handleCreateWindow = async (groupId: string) => {
+    try {
+      const groupTabs = groups[groupId];
+      const firstTab = groupTabs[0];
+      
+      // Create new window with first tab
+      const newWindow = await chrome.windows.create({
+        url: firstTab.url,
+        focused: true
+      });
+
+      if (!newWindow.id) throw new Error('Failed to create window');
+
+      // Move remaining tabs to new window
+      const remainingTabs = groupTabs.slice(1);
+      for (const tab of remainingTabs) {
+        if (tab.id) {
+          await chrome.tabs.move(tab.id, { windowId: newWindow.id, index: -1 });
+        }
+      }
+
+      refreshTabs();
+      setGroups(prevGroups => {
+        const newGroups = { ...prevGroups };
+        delete newGroups[groupId];
+        return newGroups;
+      });
+    } catch (err) {
+      console.error('Error creating new window:', err);
+      setError('Failed to create new window. Please try again.');
+    }
+  };
+
+  const handleMoveTab = async (tabId: number, targetWindowId: number) => {
+    try {
+      await chrome.tabs.move(tabId, { windowId: targetWindowId, index: -1 });
+      setShowMoveMenu(null);
+      refreshTabs();
+    } catch (err) {
+      console.error('Error moving tab:', err);
+      setError('Failed to move tab. Please try again.');
+    }
+  };
+
+  const handleMoveGroup = async (groupId: string, targetWindowId: number) => {
+    try {
+      const groupTabs = groups[groupId];
+      for (const tab of groupTabs) {
+        if (tab.id) {
+          await chrome.tabs.move(tab.id, { windowId: targetWindowId, index: -1 });
+        }
+      }
+      refreshTabs();
+      setGroups(prevGroups => {
+        const newGroups = { ...prevGroups };
+        delete newGroups[groupId];
+        return newGroups;
+      });
+    } catch (err) {
+      console.error('Error moving group:', err);
+      setError('Failed to move group. Please try again.');
+    }
+  };
 
   const handleTabAction = async (action: TabAction) => {
     if (!action.tabId) {
@@ -172,21 +237,30 @@ const Popup: React.FC = () => {
     <div className="w-96 p-4">
       <h1 className="text-2xl font-bold mb-4">AI Tab Manager</h1>
       
-      {/* Window Selection */}
-      <div className="mb-4">
-        <select
-          className="w-full p-2 border rounded"
-          value={selectedWindow}
-          onChange={(e) => handleWindowChange(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-        >
-          <option value="all">All Windows ({tabs.length} tabs)</option>
-          {windows.map((window, index) => (
-            <option key={window.id} value={window.id}>
-              Window {index + 1} ({window.tabs.length} tabs)
-              {window.focused ? ' (Current)' : ''}
-            </option>
-          ))}
-        </select>
+      {/* Window Management */}
+      <div className="mb-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <select
+            className="flex-1 p-2 border rounded mr-2"
+            value={selectedWindow}
+            onChange={(e) => handleWindowChange(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+          >
+            <option value="all">All Windows ({tabs.length} tabs)</option>
+            {windows.map((window, index) => (
+              <option key={window.id} value={window.id}>
+                Window {index + 1} ({window.tabs.length} tabs)
+                {window.focused ? ' (Current)' : ''}
+              </option>
+            ))}
+          </select>
+          <button
+            className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            onClick={() => chrome.windows.create({})}
+            title="Create new window"
+          >
+            + New
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -199,13 +273,44 @@ const Popup: React.FC = () => {
         <div key={groupId} className="border rounded p-4 mb-4">
           <div className="flex justify-between items-center mb-2">
             <h2 className="font-semibold">Group {groupId} ({groupTabs.length} tabs)</h2>
-            <div className="space-x-2">
+            <div className="space-x-2 flex items-center">
+              <div className="relative">
+                <button
+                  onClick={() => setShowMoveMenu(prev => prev === Number(groupId) ? null : Number(groupId))}
+                  className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded"
+                  title="Move group to window"
+                >
+                  📦
+                </button>
+                {showMoveMenu === Number(groupId) && (
+                  <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20 border">
+                    <button
+                      onClick={() => handleCreateWindow(groupId)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                    >
+                      New Window
+                    </button>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    {windows.map(window => (
+                      <button
+                        key={window.id}
+                        onClick={() => handleMoveGroup(groupId, window.id)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        disabled={window.id === selectedWindow}
+                      >
+                        Window {windows.indexOf(window) + 1}
+                        {window.focused ? ' (Current)' : ''}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => handleCloseGroup(groupId)}
                 className="text-red-600 hover:text-red-800 px-2 py-1 rounded"
                 title="Close all tabs in this group"
               >
-                Close Group
+                ✕
               </button>
             </div>
           </div>
@@ -224,6 +329,30 @@ const Popup: React.FC = () => {
                   </span>
                 </div>
                 <div className="space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="relative inline-block">
+                    <button
+                      onClick={() => setShowMoveMenu(prev => prev === tab.id! ? null : tab.id!)}
+                      className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded"
+                      title="Move to window"
+                    >
+                      📦
+                    </button>
+                    {showMoveMenu === tab.id && (
+                      <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20 border">
+                        {windows.map(window => (
+                          <button
+                            key={window.id}
+                            onClick={() => handleMoveTab(tab.id!, window.id)}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                            disabled={window.id === tab.windowId}
+                          >
+                            Window {windows.indexOf(window) + 1}
+                            {window.focused ? ' (Current)' : ''}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={() => tab.id && handleTabAction({ type: tab.pinned ? 'UNPIN' : 'PIN', tabId: tab.id })}
                     className="text-gray-600 hover:text-gray-800 px-2 py-1 rounded"
