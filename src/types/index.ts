@@ -1,51 +1,50 @@
 export interface Tab {
   id?: number;
-  title: string;
-  url: string;
+  title?: string;
+  url?: string;
   favIconUrl?: string;
   windowId?: number;
-  active?: boolean;
   pinned?: boolean;
   index?: number;
 }
 
 export interface TabGroup {
   id: string;
-  name: string;
+  windowId: number;
   tabs: Tab[];
-  summary?: string;
-  windowId?: number;
   color?: string;
   collapsed?: boolean;
+  title?: string;
 }
 
 export interface Window {
   id: number;
-  focused: boolean;
+  focused?: boolean;
   tabs: Tab[];
-  state?: 'normal' | 'minimized' | 'maximized';
+  state?: 'normal' | 'minimized' | 'maximized' | 'fullscreen';
   left?: number;
   top?: number;
   width?: number;
   height?: number;
 }
 
-export interface TabAction {
-  type: 'CLOSE' | 'PIN' | 'UNPIN' | 'MOVE' | 'REORDER';
+export type TabAction = {
+  type: 'PIN' | 'UNPIN' | 'CLOSE' | 'REORDER' | 'MOVE';
   tabId: number;
+  targetIndex?: number;
   windowId?: number;
   targetWindowId?: number;
-  targetIndex?: number;
 }
 
-export interface WindowAction {
+export type WindowAction = {
   type: 'ARRANGE' | 'CASCADE' | 'TILE' | 'MINIMIZE' | 'MAXIMIZE' | 'RESTORE';
-  windowId?: number;
+  windowId: number;
 }
 
-export interface GroupAction {
+export type GroupAction = {
   type: 'RENAME' | 'COLLAPSE' | 'EXPAND' | 'SET_COLOR' | 'MERGE' | 'SPLIT';
   groupId: string;
   targetGroupId?: string;
-  value?: string;
+  color?: string;
+  title?: string;
 } 

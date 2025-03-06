@@ -571,9 +571,6 @@ video {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
 .mb-4 {
   margin-bottom: 1rem;
 }
@@ -588,9 +585,6 @@ video {
 }
 .block {
   display: block;
-}
-.inline-block {
-  display: inline-block;
 }
 .flex {
   display: flex;
@@ -612,6 +606,9 @@ video {
 }
 .flex-1 {
   flex: 1 1 0%;
+}
+.cursor-move {
+  cursor: move;
 }
 .cursor-not-allowed {
   cursor: not-allowed;
@@ -638,10 +635,20 @@ video {
   margin-right: calc(0.5rem * var(--tw-space-x-reverse));
   margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
 }
+.space-y-1 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.25rem * var(--tw-space-y-reverse));
+}
 .space-y-2 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
 .truncate {
   overflow: hidden;
@@ -650,6 +657,9 @@ video {
 }
 .rounded {
   border-radius: 0.25rem;
+}
+.rounded-lg {
+  border-radius: 0.5rem;
 }
 .rounded-md {
   border-radius: 0.375rem;
@@ -660,9 +670,12 @@ video {
 .border-t {
   border-top-width: 1px;
 }
-.border-gray-100 {
+.border-t-2 {
+  border-top-width: 2px;
+}
+.border-blue-500 {
   --tw-border-opacity: 1;
-  border-color: rgb(243 244 246 / var(--tw-border-opacity, 1));
+  border-color: rgb(59 130 246 / var(--tw-border-opacity, 1));
 }
 .border-red-400 {
   --tw-border-opacity: 1;
@@ -732,8 +745,8 @@ video {
 .font-bold {
   font-weight: 700;
 }
-.font-semibold {
-  font-weight: 600;
+.font-medium {
+  font-weight: 500;
 }
 .text-blue-600 {
   --tw-text-opacity: 1;
@@ -746,6 +759,10 @@ video {
 .text-gray-700 {
   --tw-text-opacity: 1;
   color: rgb(55 65 81 / var(--tw-text-opacity, 1));
+}
+.text-gray-900 {
+  --tw-text-opacity: 1;
+  color: rgb(17 24 39 / var(--tw-text-opacity, 1));
 }
 .text-red-600 {
   --tw-text-opacity: 1;
@@ -761,6 +778,14 @@ video {
 }
 .opacity-0 {
   opacity: 0;
+}
+.opacity-50 {
+  opacity: 0.5;
+}
+.shadow {
+  --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 .shadow-xl {
   --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
@@ -825,9 +850,57 @@ body {
 
 .group:hover .group-hover\\:opacity-100 {
   opacity: 1;
-} `, "",{"version":3,"sources":["webpack://./src/popup/index.css"],"names":[],"mappings":"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","sourcesContent":["@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\nbody {\n  width: 400px;\n  min-height: 600px;\n  margin: 0;\n  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n} "],"sourceRoot":""}]);
+} `, "",{"version":3,"sources":["webpack://./src/popup/index.css"],"names":[],"mappings":"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","sourcesContent":["@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\nbody {\n  width: 400px;\n  min-height: 600px;\n  margin: 0;\n  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n} "],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./src/components/DraggableTab.tsx":
+/*!*****************************************!*\
+  !*** ./src/components/DraggableTab.tsx ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DraggableTab: () => (/* binding */ DraggableTab)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var react_dnd__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dnd */ "./node_modules/react-dnd/dist/hooks/useDrag/useDrag.js");
+/* harmony import */ var react_dnd__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dnd */ "./node_modules/react-dnd/dist/hooks/useDrop/useDrop.js");
+
+
+const DraggableTab = ({ tab, index, groupId, onTabClick, onTabAction, onTabMove, }) => {
+    const [{ isDragging }, drag] = (0,react_dnd__WEBPACK_IMPORTED_MODULE_1__.useDrag)({
+        type: 'TAB',
+        item: { type: 'TAB', id: tab.id, groupId, index },
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    });
+    const [{ isOver }, drop] = (0,react_dnd__WEBPACK_IMPORTED_MODULE_2__.useDrop)({
+        accept: 'TAB',
+        hover(item, monitor) {
+            if (!tab.id)
+                return;
+            if (item.id === tab.id)
+                return;
+            onTabMove(item.index, index, groupId);
+            item.index = index;
+        },
+        collect: (monitor) => ({
+            isOver: monitor.isOver(),
+        }),
+    });
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { ref: (node) => drag(drop(node)), className: `flex items-center justify-between group hover:bg-gray-50 p-2 rounded cursor-move
+        ${isDragging ? 'opacity-50' : ''}
+        ${isOver ? 'border-t-2 border-blue-500' : ''}`, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center space-x-2 flex-1", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "cursor-move px-2", children: "\u22EE\u22EE" }), tab.favIconUrl && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("img", { src: tab.favIconUrl, alt: "", className: "w-4 h-4" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "truncate flex-1 cursor-pointer hover:text-blue-600", onClick: (e) => {
+                            e.stopPropagation();
+                            tab.id && onTabClick(tab.id);
+                        }, children: tab.title })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "space-x-1 opacity-0 group-hover:opacity-100 transition-opacity", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => tab.id && onTabAction({ type: tab.pinned ? 'UNPIN' : 'PIN', tabId: tab.id }), className: "text-gray-600 hover:text-gray-800 px-2 py-1 rounded", title: tab.pinned ? "Unpin tab" : "Pin tab", children: "\uD83D\uDCCC" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => tab.id && onTabAction({ type: 'CLOSE', tabId: tab.id }), className: "text-red-600 hover:text-red-800 px-2 py-1 rounded", title: "Close tab", children: "\u2715" })] })] }));
+};
 
 
 /***/ }),
@@ -845,12 +918,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react_dnd__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dnd */ "./node_modules/react-dnd/dist/core/DndProvider.js");
+/* harmony import */ var react_dnd_html5_backend__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-dnd-html5-backend */ "./node_modules/react-dnd-html5-backend/dist/index.js");
+/* harmony import */ var _components_DraggableTab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/DraggableTab */ "./src/components/DraggableTab.tsx");
+
+
+
 
 
 const Popup = () => {
     const [tabs, setTabs] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
     const [windows, setWindows] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
-    const [groups, setGroups] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+    const [groups, setGroups] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
     const [isAnalyzing, setIsAnalyzing] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
     const [error, setError] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null);
     const [selectedWindow, setSelectedWindow] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('all');
@@ -883,36 +962,39 @@ const Popup = () => {
         if (selectedWindow === 'all') {
             return tabs;
         }
-        return tabs.filter(tab => tab.windowId === selectedWindow);
+        const windowId = parseInt(selectedWindow, 10);
+        return tabs.filter(tab => tab.windowId === windowId);
     }, [tabs, selectedWindow]);
     const handleCreateWindow = async (groupId) => {
         try {
-            const groupTabs = groups[groupId];
+            const groupTabs = groups.find(g => g.id === groupId)?.tabs || [];
             const firstTab = groupTabs[0];
-            // Create new window with first tab
-            const newWindow = await chrome.windows.create({
-                url: firstTab.url,
-                focused: true
-            });
-            if (!newWindow.id)
-                throw new Error('Failed to create window');
-            // Move remaining tabs to new window
+            if (!firstTab || !firstTab.id) {
+                console.error('No valid tabs in group');
+                return;
+            }
+            const newWindow = await chrome.windows.create({ tabId: firstTab.id });
+            if (!newWindow || !newWindow.id) {
+                console.error('Failed to create new window');
+                return;
+            }
             const remainingTabs = groupTabs.slice(1);
             for (const tab of remainingTabs) {
                 if (tab.id) {
-                    await chrome.tabs.move(tab.id, { windowId: newWindow.id, index: -1 });
+                    await handleTabAction({
+                        type: 'MOVE',
+                        tabId: tab.id,
+                        targetWindowId: newWindow.id,
+                        targetIndex: -1
+                    });
                 }
             }
             refreshTabs();
-            setGroups(prevGroups => {
-                const newGroups = { ...prevGroups };
-                delete newGroups[groupId];
-                return newGroups;
-            });
+            setGroups(prevGroups => prevGroups.filter(g => g.id !== groupId));
+            setShowMoveMenu(null);
         }
         catch (err) {
             console.error('Error creating new window:', err);
-            setError('Failed to create new window. Please try again.');
         }
     };
     const handleMoveTab = async (tabId, targetWindowId) => {
@@ -928,72 +1010,64 @@ const Popup = () => {
     };
     const handleMoveGroup = async (groupId, targetWindowId) => {
         try {
-            const groupTabs = groups[groupId];
+            const groupTabs = groups.find(g => g.id === groupId)?.tabs || [];
             for (const tab of groupTabs) {
                 if (tab.id) {
-                    await chrome.tabs.move(tab.id, { windowId: targetWindowId, index: -1 });
+                    await handleTabAction({
+                        type: 'MOVE',
+                        tabId: tab.id,
+                        targetWindowId,
+                        targetIndex: -1
+                    });
                 }
             }
             refreshTabs();
-            setGroups(prevGroups => {
-                const newGroups = { ...prevGroups };
-                delete newGroups[groupId];
-                return newGroups;
-            });
+            setGroups(prevGroups => prevGroups.filter(g => g.id !== groupId));
+            setShowMoveMenu(null);
         }
         catch (err) {
             console.error('Error moving group:', err);
-            setError('Failed to move group. Please try again.');
         }
     };
     const handleTabAction = async (action) => {
-        if (!action.tabId) {
-            console.error('No tab ID provided for action:', action);
-            return;
-        }
         try {
             switch (action.type) {
+                case 'PIN':
+                case 'UNPIN':
+                    await chrome.tabs.update(action.tabId, { pinned: action.type === 'PIN' });
+                    break;
                 case 'CLOSE':
-                    console.log('Closing tab:', action.tabId);
                     await chrome.tabs.remove(action.tabId);
                     setTabs(prevTabs => prevTabs.filter(tab => tab.id !== action.tabId));
-                    setGroups(prevGroups => {
-                        const newGroups = { ...prevGroups };
-                        Object.keys(newGroups).forEach(groupId => {
-                            newGroups[groupId] = newGroups[groupId].filter(tab => tab.id !== action.tabId);
-                        });
-                        return newGroups;
-                    });
-                    break;
-                case 'PIN':
-                    console.log('Pinning tab:', action.tabId);
-                    await chrome.tabs.update(action.tabId, { pinned: true });
-                    setTabs(prevTabs => prevTabs.map(tab => tab.id === action.tabId ? { ...tab, pinned: true } : tab));
-                    break;
-                case 'UNPIN':
-                    console.log('Unpinning tab:', action.tabId);
-                    await chrome.tabs.update(action.tabId, { pinned: false });
-                    setTabs(prevTabs => prevTabs.map(tab => tab.id === action.tabId ? { ...tab, pinned: false } : tab));
+                    setGroups(prevGroups => prevGroups.map(g => ({
+                        ...g,
+                        tabs: g.tabs.filter(tab => tab.id !== action.tabId)
+                    })));
                     break;
                 case 'MOVE':
                     if (action.targetWindowId) {
-                        await chrome.tabs.move(action.tabId, { windowId: action.targetWindowId, index: -1 });
-                        refreshTabs();
+                        await chrome.tabs.move(action.tabId, {
+                            windowId: action.targetWindowId,
+                            index: action.targetIndex ?? -1
+                        });
+                    }
+                    break;
+                case 'REORDER':
+                    if (action.targetIndex !== undefined) {
+                        await chrome.tabs.move(action.tabId, { index: action.targetIndex });
                     }
                     break;
             }
+            refreshTabs();
         }
         catch (err) {
-            console.error('Error performing tab action:', err);
-            setError(`Failed to ${action.type.toLowerCase()} tab. Please try again.`);
-            // Refresh tabs to ensure UI is in sync with actual state
-            refreshTabs();
+            console.error('Error handling tab action:', err);
         }
     };
     const handleAnalyzeTabs = async () => {
         setIsAnalyzing(true);
         setError(null);
-        setGroups({}); // Clear existing groups
+        setGroups([]); // Clear existing groups
         try {
             const response = await new Promise((resolve) => {
                 chrome.runtime.sendMessage({
@@ -1006,9 +1080,13 @@ const Popup = () => {
                 throw new Error('Invalid response from tab analysis');
             }
             const tabGroups = Object.entries(response.groups).reduce((acc, [groupId, indices]) => {
-                acc[groupId] = indices.map(index => filteredTabs[index]).filter(tab => tab); // Use filtered tabs
+                acc.push({
+                    id: groupId,
+                    tabs: indices.map(index => filteredTabs[index]).filter(tab => tab),
+                    summary: groupId
+                });
                 return acc;
-            }, {});
+            }, []);
             setGroups(tabGroups);
         }
         catch (err) {
@@ -1020,19 +1098,15 @@ const Popup = () => {
         }
     };
     const handleCloseGroup = async (groupId) => {
-        const tabsToClose = groups[groupId];
-        const tabIds = tabsToClose.map(tab => tab.id).filter((id) => id !== undefined);
+        const groupTabs = groups.find(g => g.id === groupId)?.tabs || [];
+        const tabIds = groupTabs.map(tab => tab.id).filter((id) => id !== undefined);
         if (tabIds.length === 0) {
             console.warn('No valid tab IDs found in group:', groupId);
             return;
         }
         try {
             await chrome.tabs.remove(tabIds);
-            setGroups(prevGroups => {
-                const newGroups = { ...prevGroups };
-                delete newGroups[groupId];
-                return newGroups;
-            });
+            setGroups(prevGroups => prevGroups.filter(g => g.id !== groupId));
             setTabs(prevTabs => prevTabs.filter(tab => !tabIds.includes(tab.id)));
         }
         catch (err) {
@@ -1056,11 +1130,26 @@ const Popup = () => {
     }, [tabs]);
     const handleWindowChange = (windowId) => {
         setSelectedWindow(windowId);
-        setGroups({}); // Clear groups when window selection changes
+        setGroups([]); // Clear groups when window selection changes
     };
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "w-96 p-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", { className: "text-2xl font-bold mb-4", children: "AI Tab Manager" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "mb-4 space-y-2", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center justify-between", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", { className: "flex-1 p-2 border rounded mr-2", value: selectedWindow, onChange: (e) => handleWindowChange(e.target.value === 'all' ? 'all' : Number(e.target.value)), children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("option", { value: "all", children: ["All Windows (", tabs.length, " tabs)"] }), windows.map((window, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("option", { value: window.id, children: ["Window ", index + 1, " (", window.tabs.length, " tabs)", window.focused ? ' (Current)' : ''] }, window.id)))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600", onClick: () => chrome.windows.create({}), title: "Create new window", children: "+ New" })] }) }), error && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4", children: error })), Object.entries(groups).map(([groupId, groupTabs]) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "border rounded p-4 mb-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex justify-between items-center mb-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h2", { className: "font-semibold", children: ["Group ", groupId, " (", groupTabs.length, " tabs)"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "space-x-2 flex items-center", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "relative", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => setShowMoveMenu(prev => prev === Number(groupId) ? null : Number(groupId)), className: "text-blue-600 hover:text-blue-800 px-2 py-1 rounded", title: "Move group to window", children: "\uD83D\uDCE6" }), showMoveMenu === Number(groupId) && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20 border", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => handleCreateWindow(groupId), className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left", children: "New Window" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "border-t border-gray-100 my-1" }), windows.map(window => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: () => handleMoveGroup(groupId, window.id), className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left", disabled: window.id === selectedWindow, children: ["Window ", windows.indexOf(window) + 1, window.focused ? ' (Current)' : ''] }, window.id)))] }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => handleCloseGroup(groupId), className: "text-red-600 hover:text-red-800 px-2 py-1 rounded", title: "Close all tabs in this group", children: "\u2715" })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "space-y-2", children: groupTabs.map((tab) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("li", { className: "flex items-center justify-between group hover:bg-gray-50 p-2 rounded", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center space-x-2 flex-1", children: [tab.favIconUrl && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("img", { src: tab.favIconUrl, alt: "", className: "w-4 h-4" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "truncate flex-1 cursor-pointer hover:text-blue-600", onClick: () => tab.id && handleTabClick(tab.id), children: tab.title })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "space-x-1 opacity-0 group-hover:opacity-100 transition-opacity", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "relative inline-block", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => setShowMoveMenu(prev => prev === tab.id ? null : tab.id), className: "text-blue-600 hover:text-blue-800 px-2 py-1 rounded", title: "Move to window", children: "\uD83D\uDCE6" }), showMoveMenu === tab.id && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20 border", children: windows.map(window => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: () => handleMoveTab(tab.id, window.id), className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left", disabled: window.id === tab.windowId, children: ["Window ", windows.indexOf(window) + 1, window.focused ? ' (Current)' : ''] }, window.id))) }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => tab.id && handleTabAction({ type: tab.pinned ? 'UNPIN' : 'PIN', tabId: tab.id }), className: "text-gray-600 hover:text-gray-800 px-2 py-1 rounded", title: tab.pinned ? "Unpin tab" : "Pin tab", children: "\uD83D\uDCCC" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => tab.id && handleTabAction({ type: 'CLOSE', tabId: tab.id }), className: "text-red-600 hover:text-red-800 px-2 py-1 rounded", title: "Close tab", children: "\u2715" })] })] }, tab.id))) })] }, groupId))), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "flex justify-end mt-4", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: `px-4 py-2 rounded text-white ${isAnalyzing
-                        ? 'bg-blue-400 cursor-not-allowed'
-                        : 'bg-blue-500 hover:bg-blue-600'}`, onClick: handleAnalyzeTabs, disabled: isAnalyzing, children: isAnalyzing ? 'Analyzing...' : `Analyze ${selectedWindow === 'all' ? 'All' : 'Window'} Tabs` }) })] }));
+    const handleTabMove = (dragIndex, hoverIndex, groupId) => {
+        const updatedGroups = groups.map((group) => {
+            if (group.id === groupId) {
+                const newTabs = [...group.tabs];
+                const [draggedTab] = newTabs.splice(dragIndex, 1);
+                newTabs.splice(hoverIndex, 0, draggedTab);
+                return { ...group, tabs: newTabs };
+            }
+            return group;
+        });
+        setGroups(updatedGroups);
+    };
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_dnd__WEBPACK_IMPORTED_MODULE_3__.DndProvider, { backend: react_dnd_html5_backend__WEBPACK_IMPORTED_MODULE_4__.HTML5Backend, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "w-96 p-4 bg-white", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", { className: "text-2xl font-bold mb-4", children: "AI Tab Manager" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "mb-4 space-y-2", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center justify-between", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", { className: "flex-1 p-2 border rounded mr-2", value: selectedWindow, onChange: (e) => handleWindowChange(e.target.value), children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("option", { value: "all", children: ["All Windows (", tabs.length, " tabs)"] }), windows.map((window, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("option", { value: window.id.toString(), children: ["Window ", index + 1, " (", window.tabs.length, " tabs)", window.focused ? ' (Current)' : ''] }, window.id)))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600", onClick: () => chrome.windows.create({}), title: "Create new window", children: "+ New" })] }) }), error && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4", children: error })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "mt-4 space-y-4", children: groups.map((group) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "bg-white rounded-lg shadow p-2 space-y-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center justify-between", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h3", { className: "font-medium text-gray-900", children: group.summary }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center space-x-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "relative", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => setShowMoveMenu(prev => prev === group.id ? null : group.id), className: "text-blue-600 hover:text-blue-800 px-2 py-1 rounded", title: "Move group to window", children: "\uD83D\uDCE6" }), showMoveMenu === group.id && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20 border", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => handleCreateWindow(group.id), className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left", children: "Create New Window" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "border-t my-1" }), windows.map(window => {
+                                                                const isCurrentWindow = window.id.toString() === selectedWindow;
+                                                                return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: () => handleMoveGroup(group.id, window.id), className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left", disabled: isCurrentWindow, children: ["Window ", windows.indexOf(window) + 1, window.focused ? ' (Current)' : ''] }, window.id));
+                                                            })] }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => handleCloseGroup(group.id), className: "text-red-600 hover:text-red-800 px-2 py-1 rounded", title: "Close all tabs in this group", children: "\u2715" })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "space-y-1", children: group.tabs.map((tab, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_DraggableTab__WEBPACK_IMPORTED_MODULE_2__.DraggableTab, { tab: tab, index: index, groupId: group.id, onTabClick: handleTabClick, onTabAction: handleTabAction, onTabMove: handleTabMove }, tab.id))) })] }, group.id))) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "flex justify-end mt-4", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: `px-4 py-2 rounded text-white ${isAnalyzing
+                            ? 'bg-blue-400 cursor-not-allowed'
+                            : 'bg-blue-500 hover:bg-blue-600'}`, onClick: handleAnalyzeTabs, disabled: isAnalyzing, children: isAnalyzing ? 'Analyzing...' : `Analyze ${selectedWindow === 'all' ? 'All' : 'Window'} Tabs` }) })] }) }));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Popup);
 
@@ -1320,7 +1409,7 @@ root.render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_Popup__WEBPA
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["vendor-style-loader","vendor-react","vendor-react-dom","vendor-scheduler","vendor-css-loader"], () => (__webpack_require__("./src/popup/index.tsx")))
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["vendor-react-dnd","vendor-dnd-core","vendor-react-dnd-html5-backend","vendor-style-loader","vendor-babel","vendor-react","vendor-react-dom","vendor-scheduler","vendor-css-loader","vendor-redux","vendor-fast-deep-equal"], () => (__webpack_require__("./src/popup/index.tsx")))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()
