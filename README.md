@@ -9,52 +9,48 @@ flowchart TD
     Init --> LoadWindows[Load Chrome Windows]
     LoadWindows --> LoadTabs[Fetch All Tabs]
     
-    %% User Interface Layer with rounded edges
-    subgraph User_Interface[" User Interface Layer "]
+    %% User Interface Layer
+    subgraph User_Interface[" User Interface "]
         direction TB
         LoadTabs --> |Initialize| UI[Window Manager]
-        UI --> |"1. Select"| WindowView["Display Window Tabs"]
-        UI --> |"2. Drag"| DragOp["Drag Operation"]
-        UI --> |"3. Click"| TabOp["Tab Actions"]
+        UI --> |"1"| WindowView["Display Tabs"]
+        UI --> |"2"| DragOp["Drag Operation"]
+        UI --> |"3"| TabOp["Tab Actions"]
     end
 
-    %% Tab Operations with clear actions
+    %% Tab Operations
     subgraph Tab_Operations[" Tab Management "]
         direction TB
-        DragOp --> |"Drop"| MoveTab["Move to Window"]
-        DragOp --> |"Reorder"| ReorderTab["Change Position"]
+        DragOp --> |"Drop"| MoveTab["Move Window"]
+        DragOp --> |"Sort"| ReorderTab["Reposition"]
         TabOp --> |"Toggle"| PinTab["Pin/Unpin"]
-        TabOp --> |"Remove"| CloseTab["Close Tab"]
+        TabOp --> |"Close"| CloseTab["Remove"]
     end
 
-    %% State Management with feedback loop
-    subgraph State_Updates[" State Management "]
+    %% State Management
+    subgraph State_Updates[" State Updates "]
         direction TB
-        MoveTab & ReorderTab & PinTab & CloseTab --> UpdateState["Update State"]
-        UpdateState --> RefreshUI["Refresh UI"]
-        RefreshUI --> |"Update"| UI
+        MoveTab & ReorderTab & PinTab & CloseTab --> UpdateState["Update"]
+        UpdateState --> RefreshUI["Refresh"]
+        RefreshUI --> |"Sync"| UI
     end
 
     %% Styling
-    classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px
-    classDef start fill:#f0f8ff,stroke:#2563eb,stroke-width:3px
-    classDef process fill:#ffffff,stroke:#333,stroke-width:1px
+    classDef default fill:white,stroke:#333,stroke-width:1px
+    classDef start fill:white,stroke:#000,stroke-width:2px
     
     class Start start
-    class Init,LoadWindows,LoadTabs process
     
     %% Subgraph styling
-    style User_Interface fill:#e6f3ff,stroke:#2563eb,stroke-width:2px
-    style Tab_Operations fill:#ffe6e6,stroke:#dc2626,stroke-width:2px
-    style State_Updates fill:#e6ffe6,stroke:#16a34a,stroke-width:2px
+    style User_Interface fill:white,stroke:#000,stroke-width:1px
+    style Tab_Operations fill:white,stroke:#000,stroke-width:1px
+    style State_Updates fill:white,stroke:#000,stroke-width:1px
     
-    %% Node styling
-    style UI fill:#ffffff,stroke:#2563eb,stroke-width:2px
-    style WindowView,DragOp,TabOp fill:#ffffff,stroke:#2563eb,stroke-width:1px
-    
-    style MoveTab,ReorderTab,PinTab,CloseTab fill:#ffffff,stroke:#dc2626,stroke-width:1px
-    
-    style UpdateState,RefreshUI fill:#ffffff,stroke:#16a34a,stroke-width:1px
+    %% Node styling - all nodes white with black borders
+    style UI,WindowView,DragOp,TabOp fill:white,stroke:#000,stroke-width:1px
+    style MoveTab,ReorderTab,PinTab,CloseTab fill:white,stroke:#000,stroke-width:1px
+    style UpdateState,RefreshUI fill:white,stroke:#000,stroke-width:1px
+    style Init,LoadWindows,LoadTabs fill:white,stroke:#000,stroke-width:1px
 ```
 
 ## Features
