@@ -19,6 +19,7 @@ const Popup: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedWindow, setSelectedWindow] = useState<string>('all');
   const [showMoveMenu, setShowMoveMenu] = useState<string | null>(null);
+  const [isDraggingTab, setIsDraggingTab] = useState(false);
 
   const refreshTabs = useCallback(() => {
     chrome.windows.getAll({ populate: true }, (chromeWindows) => {
@@ -244,6 +245,12 @@ const Popup: React.FC = () => {
     setGroups(updatedGroups);
   };
 
+  // Map windows to the format expected by DraggableTab
+  const windowsForDraggable = useMemo(() => windows.map(window => ({
+    id: window.id,
+    focused: window.focused || false
+  })), [windows]);
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="w-96 min-h-[600px] bg-gradient-to-br from-slate-50 to-slate-100">
@@ -290,6 +297,39 @@ const Popup: React.FC = () => {
                 <span>+</span>
                 <span>New</span>
               </button>
+            </div>
+
+            {/* Window Drop Zones */}
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {windows.map((window, index) => (
+                <div
+                  key={window.id}
+                  className={`
+                    p-2 border-2 border-dashed rounded-lg text-center text-sm
+                    ${isDraggingTab ? 'border-blue-400 bg-blue-50' : 'border-gray-200'}
+                    transition-all duration-200 transform hover:scale-102
+                  `}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    if (data.tabId && data.windowId !== window.id) {
+                      handleTabAction({
+                        type: 'MOVE',
+                        tabId: data.tabId,
+                        targetWindowId: window.id,
+                        targetIndex: -1
+                      });
+                    }
+                  }}
+                >
+                  Drop to Window {index + 1}
+                  {window.focused ? ' (Current)' : ''}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -387,6 +427,7 @@ const Popup: React.FC = () => {
                       tab={tab}
                       index={index}
                       groupId={group.id}
+                      windows={windowsForDraggable}
                       onTabClick={handleTabClick}
                       onTabAction={handleTabAction}
                       onTabMove={handleTabMove}

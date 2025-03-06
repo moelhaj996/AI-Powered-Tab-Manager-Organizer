@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Identifier } from 'dnd-core';
 import { useDrag, useDrop } from 'react-dnd/dist/hooks';
 import { Tab } from '../types';
@@ -7,6 +7,7 @@ interface DraggableTabProps {
   tab: Tab;
   index: number;
   groupId: string;
+  windows: { id: number; focused: boolean }[];
   onTabClick: (tabId: number) => void;
   onTabAction: (action: any) => void;
   onTabMove: (dragIndex: number, hoverIndex: number, groupId: string) => void;
@@ -17,29 +18,45 @@ interface DragItem {
   id: number;
   groupId: string;
   index: number;
+  windowId: number;
 }
 
 export const DraggableTab: React.FC<DraggableTabProps> = ({
   tab,
   index,
   groupId,
+  windows,
   onTabClick,
   onTabAction,
   onTabMove,
 }) => {
+  const [showWindowDropdown, setShowWindowDropdown] = useState(false);
+
   const [{ isDragging }, drag] = useDrag<DragItem, void, { isDragging: boolean }>({
     type: 'TAB',
-    item: { type: 'TAB', id: tab.id!, groupId, index },
+    item: { type: 'TAB', id: tab.id!, groupId, index, windowId: tab.windowId! },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
+    end: (item, monitor) => {
+      const dropResult = monitor.getDropResult<{ windowId?: number }>();
+      if (dropResult && dropResult.windowId && dropResult.windowId !== tab.windowId) {
+        onTabAction({
+          type: 'MOVE',
+          tabId: tab.id,
+          targetWindowId: dropResult.windowId,
+          targetIndex: -1
+        });
+      }
+    },
   });
 
-  const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>({
+  const [{ isOver }, drop] = useDrop<DragItem, { windowId?: number }, { isOver: boolean }>({
     accept: 'TAB',
     hover(item, monitor) {
       if (!tab.id) return;
       if (item.id === tab.id) return;
+      if (item.windowId !== tab.windowId) return;
 
       onTabMove(item.index, index, groupId);
       item.index = index;
@@ -61,11 +78,41 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
       `}
     >
       <div className="flex items-center space-x-3">
-        {/* Drag Handle */}
-        <div className="flex-shrink-0 cursor-move text-gray-400 hover:text-gray-600 transition-colors duration-200">
+        {/* Drag Handle with Window Dropdown */}
+        <div 
+          className="relative flex-shrink-0 cursor-move text-gray-400 hover:text-gray-600 transition-colors duration-200"
+          onMouseEnter={() => setShowWindowDropdown(true)}
+          onMouseLeave={() => setShowWindowDropdown(false)}
+        >
           <svg className="w-5 h-5 transform group-hover:rotate-12 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
           </svg>
+          
+          {showWindowDropdown && (
+            <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-30 border border-gray-100 animate-fadeIn">
+              {windows.map((window, index) => (
+                window.id !== tab.windowId && (
+                  <button
+                    key={window.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTabAction({
+                        type: 'MOVE',
+                        tabId: tab.id,
+                        targetWindowId: window.id,
+                        targetIndex: -1
+                      });
+                      setShowWindowDropdown(false);
+                    }}
+                    className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                  >
+                    Move to Window {index + 1}
+                    {window.focused ? ' (Current)' : ''}
+                  </button>
+                )
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Favicon */}
