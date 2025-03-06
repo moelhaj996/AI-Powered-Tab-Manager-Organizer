@@ -52,33 +52,35 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
   return (
     <div
       ref={(node) => drag(drop(node))}
+      style={{ animationDelay: `${index * 50}ms` }}
       className={`
-        group px-4 py-3 bg-white hover:bg-gray-50 transition-colors
-        ${isDragging ? 'opacity-50 bg-blue-50' : ''}
-        ${isOver ? 'border-t-2 border-blue-500' : ''}
+        group px-4 py-3 bg-white hover:bg-gray-50 transition-all duration-200
+        animate-slideUp transform hover:translate-x-1
+        ${isDragging ? 'opacity-50 bg-blue-50 scale-95' : ''}
+        ${isOver ? 'border-t-2 border-blue-500 translate-y-1' : ''}
       `}
     >
       <div className="flex items-center space-x-3">
         {/* Drag Handle */}
-        <div className="flex-shrink-0 cursor-move text-gray-400 hover:text-gray-600">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex-shrink-0 cursor-move text-gray-400 hover:text-gray-600 transition-colors duration-200">
+          <svg className="w-5 h-5 transform group-hover:rotate-12 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
           </svg>
         </div>
 
         {/* Favicon */}
-        <div className="flex-shrink-0 w-5 h-5">
+        <div className="flex-shrink-0 w-5 h-5 transition-transform duration-200 transform group-hover:scale-110">
           {tab.favIconUrl ? (
             <img
               src={tab.favIconUrl}
               alt=""
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain rounded-sm transition-all duration-200 hover:shadow-lg"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
           ) : (
-            <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
+            <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center transition-colors duration-200 hover:bg-gray-300">
               <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
@@ -87,9 +89,9 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
         </div>
 
         {/* Tab Title */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 transition-transform duration-200 transform group-hover:translate-x-1">
           <button
-            className="text-left w-full truncate text-gray-900 hover:text-blue-600 focus:outline-none focus:text-blue-600"
+            className="text-left w-full truncate text-gray-900 hover:text-blue-600 focus:outline-none focus:text-blue-600 transition-colors duration-200"
             onClick={(e) => {
               e.stopPropagation();
               tab.id && onTabClick(tab.id);
@@ -101,18 +103,18 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex-shrink-0 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex-shrink-0 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
           {/* Pin/Unpin Button */}
           <button
             onClick={() => tab.id && onTabAction({ type: tab.pinned ? 'UNPIN' : 'PIN', tabId: tab.id })}
-            className={`p-1.5 rounded-full transition-colors ${
+            className={`p-1.5 rounded-full transition-all duration-200 transform hover:scale-110 ${
               tab.pinned
                 ? 'text-blue-600 hover:bg-blue-50'
                 : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
             }`}
             title={tab.pinned ? "Unpin tab" : "Pin tab"}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 transform transition-transform duration-200 hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -125,10 +127,10 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
           {/* Close Button */}
           <button
             onClick={() => tab.id && onTabAction({ type: 'CLOSE', tabId: tab.id })}
-            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 transform hover:scale-110"
             title="Close tab"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 transform transition-transform duration-200 hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>

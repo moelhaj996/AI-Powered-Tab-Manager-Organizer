@@ -247,22 +247,30 @@ const Popup: React.FC = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="w-96 min-h-[600px] bg-gradient-to-br from-slate-50 to-slate-100">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 shadow-lg">
+        {/* Header with animation */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 shadow-lg animate-fadeIn">
           <div className="flex items-center space-x-3">
-            <img src={icon48} alt="AI Tab Manager" className="w-8 h-8" />
-            <h1 className="text-2xl font-bold">AI Tab Manager</h1>
+            <img 
+              src={icon48} 
+              alt="AI Tab Manager" 
+              className="w-8 h-8 animate-spin-slow" 
+            />
+            <div>
+              <h1 className="text-2xl font-bold animate-slideDown">AI Tab Manager</h1>
+              <p className="text-blue-100 text-sm mt-1 animate-fadeIn delay-200">
+                Intelligent tab organization
+              </p>
+            </div>
           </div>
-          <p className="text-blue-100 text-sm mt-1">Intelligent tab organization</p>
         </div>
         
         {/* Main Content */}
         <div className="p-4 space-y-4">
-          {/* Window Management */}
-          <div className="bg-white rounded-lg shadow-sm p-4 space-y-2">
+          {/* Window Management with animation */}
+          <div className="bg-white rounded-lg shadow-sm p-4 space-y-2 animate-slideDown delay-100">
             <div className="flex items-center justify-between">
               <select
-                className="flex-1 p-2 border border-gray-200 rounded-lg mr-2 bg-white hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                className="flex-1 p-2 border border-gray-200 rounded-lg mr-2 bg-white hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                 value={selectedWindow}
                 onChange={(e) => handleWindowChange(e.target.value)}
               >
@@ -275,7 +283,7 @@ const Popup: React.FC = () => {
                 ))}
               </select>
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2"
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transform hover:scale-105 transition-all duration-200"
                 onClick={() => chrome.windows.create({})}
                 title="Create new window"
               >
@@ -286,7 +294,7 @@ const Popup: React.FC = () => {
           </div>
 
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg animate-shake">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -300,24 +308,27 @@ const Popup: React.FC = () => {
             </div>
           )}
 
-          {/* Tab Groups */}
+          {/* Tab Groups with animations */}
           <div className="space-y-4">
-            {groups.map((group) => (
+            {groups.map((group, groupIndex) => (
               <div
                 key={group.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
+                className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden animate-slideUp`}
+                style={{ animationDelay: `${groupIndex * 100}ms` }}
               >
                 <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium text-gray-900 flex items-center space-x-2">
                       <span>{group.summary}</span>
-                      <span className="text-sm text-gray-500">({group.tabs.length} tabs)</span>
+                      <span className="text-sm text-gray-500 animate-pulse">
+                        ({group.tabs.length} tabs)
+                      </span>
                     </h3>
                     <div className="flex items-center space-x-2">
                       <div className="relative">
                         <button
                           onClick={() => setShowMoveMenu(prev => prev === group.id ? null : group.id)}
-                          className="text-gray-600 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50 transition-colors"
+                          className="text-gray-600 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50 transform hover:scale-110 transition-all duration-200"
                           title="Move group to window"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -325,7 +336,7 @@ const Popup: React.FC = () => {
                           </svg>
                         </button>
                         {showMoveMenu === group.id && (
-                          <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-xl z-20 border border-gray-100">
+                          <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-xl z-20 border border-gray-100 animate-fadeIn">
                             <button
                               onClick={() => handleCreateWindow(group.id)}
                               className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2"
@@ -359,7 +370,7 @@ const Popup: React.FC = () => {
                       </div>
                       <button
                         onClick={() => handleCloseGroup(group.id)}
-                        className="text-gray-600 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors"
+                        className="text-gray-600 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transform hover:scale-110 transition-all duration-200"
                         title="Close all tabs in this group"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -386,13 +397,13 @@ const Popup: React.FC = () => {
             ))}
           </div>
 
-          {/* Analyze Button */}
-          <div className="sticky bottom-0 bg-white border-t border-gray-100 p-4 mt-auto">
+          {/* Analyze Button with animation */}
+          <div className="sticky bottom-0 bg-white border-t border-gray-100 p-4 mt-auto animate-slideUp delay-300">
             <button
-              className={`w-full px-6 py-3 rounded-lg text-white font-medium shadow-sm transition-all ${
+              className={`w-full px-6 py-3 rounded-lg text-white font-medium shadow-sm transform hover:scale-102 transition-all duration-200 ${
                 isAnalyzing
                   ? 'bg-blue-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                  : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 hover:shadow-lg'
               }`}
               onClick={handleAnalyzeTabs}
               disabled={isAnalyzing}
@@ -404,11 +415,11 @@ const Popup: React.FC = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <span>Analyzing...</span>
+                    <span className="animate-pulse">Analyzing...</span>
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 transform group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                     <span>
