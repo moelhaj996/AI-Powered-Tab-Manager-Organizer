@@ -26,7 +26,7 @@ const WindowDropZone: React.FC<{ window: Window; index: number; onDrop: (tabId: 
     accept: 'TAB',
     canDrop: (item: DragItem) => item.windowId !== window.id,
     drop: (item: DragItem) => {
-      if (item.id) {
+      if (item.id && item.windowId !== window.id) {
         onDrop(item.id);
       }
     },
@@ -40,8 +40,9 @@ const WindowDropZone: React.FC<{ window: Window; index: number; onDrop: (tabId: 
     <div
       ref={drop}
       className={`
-        p-2 border-2 border-dashed rounded-lg text-center text-sm cursor-move
+        p-2 border-2 border-dashed rounded-lg text-center text-sm
         ${isOver && canDrop ? 'border-blue-400 bg-blue-50' : 'border-gray-200'}
+        ${canDrop ? 'cursor-copy hover:border-blue-300 hover:bg-blue-50' : 'cursor-no-drop opacity-50'}
       `}
     >
       Drop to Window {index + 1}
@@ -322,7 +323,7 @@ const Popup: React.FC = () => {
         {/* Main Content */}
         <div className="p-4 space-y-4">
           {/* Window Selection */}
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="bg-white rounded-lg shadow-sm p-4 space-y-2">
             <div className="flex items-center justify-between">
               <select
                 className="flex-1 p-2 border border-gray-200 rounded-lg mr-2 bg-white hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
@@ -345,6 +346,18 @@ const Popup: React.FC = () => {
                 <span>+</span>
                 <span>New</span>
               </button>
+            </div>
+
+            {/* Window Drop Zones */}
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {windows.map((window, index) => (
+                <WindowDropZone
+                  key={window.id}
+                  window={window}
+                  index={index}
+                  onDrop={(tabId) => handleWindowDrop(window.id, tabId)}
+                />
+              ))}
             </div>
           </div>
 

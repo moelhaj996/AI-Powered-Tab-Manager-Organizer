@@ -84,7 +84,21 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
 
   const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>({
     accept: 'TAB',
+    hover: (item, monitor) => {
+      if (!tab.id || !tab.windowId) return;
+      if (item.id === tab.id) return;
+
+      // Handle tabs in the same window
+      if (item.windowId === tab.windowId && item.index !== index) {
+        onTabMove(item.index, index, groupId);
+        item.index = index;
+      }
+    },
     drop: (item) => {
+      if (!tab.id || !tab.windowId) return;
+      if (item.id === tab.id) return;
+
+      // Handle tabs from different windows
       if (item.windowId !== tab.windowId) {
         onTabAction({
           type: 'MOVE',
@@ -92,8 +106,7 @@ export const DraggableTab: React.FC<DraggableTabProps> = ({
           targetWindowId: tab.windowId,
           targetIndex: index
         });
-      } else if (item.index !== index) {
-        onTabMove(item.index, index, groupId);
+        return;
       }
     },
     collect: (monitor) => ({
