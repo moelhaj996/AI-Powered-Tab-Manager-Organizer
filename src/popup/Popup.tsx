@@ -245,122 +245,179 @@ const Popup: React.FC = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="w-96 p-4 bg-white">
-        <h1 className="text-2xl font-bold mb-4">AI Tab Manager</h1>
-        
-        {/* Window Management */}
-        <div className="mb-4 space-y-2">
-          <div className="flex items-center justify-between">
-            <select
-              className="flex-1 p-2 border rounded mr-2"
-              value={selectedWindow}
-              onChange={(e) => handleWindowChange(e.target.value)}
-            >
-              <option value="all">All Windows ({tabs.length} tabs)</option>
-              {windows.map((window, index) => (
-                <option key={window.id} value={window.id.toString()}>
-                  Window {index + 1} ({window.tabs.length} tabs)
-                  {window.focused ? ' (Current)' : ''}
-                </option>
-              ))}
-            </select>
-            <button
-              className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              onClick={() => chrome.windows.create({})}
-              title="Create new window"
-            >
-              + New
-            </button>
+      <div className="w-96 min-h-[600px] bg-gradient-to-br from-slate-50 to-slate-100">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 shadow-lg">
+          <div className="flex items-center space-x-3">
+            <img src="../assets/icon48.png" alt="AI Tab Manager" className="w-8 h-8" />
+            <h1 className="text-2xl font-bold">AI Tab Manager</h1>
           </div>
+          <p className="text-blue-100 text-sm mt-1">Intelligent tab organization</p>
         </div>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+        
+        {/* Main Content */}
+        <div className="p-4 space-y-4">
+          {/* Window Management */}
+          <div className="bg-white rounded-lg shadow-sm p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <select
+                className="flex-1 p-2 border border-gray-200 rounded-lg mr-2 bg-white hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                value={selectedWindow}
+                onChange={(e) => handleWindowChange(e.target.value)}
+              >
+                <option value="all">All Windows ({tabs.length} tabs)</option>
+                {windows.map((window, index) => (
+                  <option key={window.id} value={window.id.toString()}>
+                    Window {index + 1} ({window.tabs.length} tabs)
+                    {window.focused ? ' (Current)' : ''}
+                  </option>
+                ))}
+              </select>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2"
+                onClick={() => chrome.windows.create({})}
+                title="Create new window"
+              >
+                <span>+</span>
+                <span>New</span>
+              </button>
+            </div>
           </div>
-        )}
 
-        <div className="mt-4 space-y-4">
-          {groups.map((group) => (
-            <div
-              key={group.id}
-              className="bg-white rounded-lg shadow p-2 space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium text-gray-900">{group.summary}</h3>
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowMoveMenu(prev => prev === group.id ? null : group.id)}
-                      className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded"
-                      title="Move group to window"
-                    >
-                      📦
-                    </button>
-                    {showMoveMenu === group.id && (
-                      <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20 border">
-                        <button
-                          onClick={() => handleCreateWindow(group.id)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                        >
-                          Create New Window
-                        </button>
-                        <div className="border-t my-1"></div>
-                        {windows.map(window => {
-                          const isCurrentWindow = window.id.toString() === selectedWindow;
-                          return (
-                            <button
-                              key={window.id}
-                              onClick={() => handleMoveGroup(group.id, window.id)}
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                              disabled={isCurrentWindow}
-                            >
-                              Window {windows.indexOf(window) + 1}
-                              {window.focused ? ' (Current)' : ''}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => handleCloseGroup(group.id)}
-                    className="text-red-600 hover:text-red-800 px-2 py-1 rounded"
-                    title="Close all tabs in this group"
-                  >
-                    ✕
-                  </button>
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
                 </div>
               </div>
-              <div className="space-y-1">
-                {group.tabs.map((tab, index) => (
-                  <DraggableTab
-                    key={tab.id}
-                    tab={tab}
-                    index={index}
-                    groupId={group.id}
-                    onTabClick={handleTabClick}
-                    onTabAction={handleTabAction}
-                    onTabMove={handleTabMove}
-                  />
-                ))}
-              </div>
             </div>
-          ))}
-        </div>
+          )}
 
-        <div className="flex justify-end mt-4">
-          <button
-            className={`px-4 py-2 rounded text-white ${
-              isAnalyzing
-                ? 'bg-blue-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600'
-            }`}
-            onClick={handleAnalyzeTabs}
-            disabled={isAnalyzing}
-          >
-            {isAnalyzing ? 'Analyzing...' : `Analyze ${selectedWindow === 'all' ? 'All' : 'Window'} Tabs`}
-          </button>
+          {/* Tab Groups */}
+          <div className="space-y-4">
+            {groups.map((group) => (
+              <div
+                key={group.id}
+                className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
+              >
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-gray-900 flex items-center space-x-2">
+                      <span>{group.summary}</span>
+                      <span className="text-sm text-gray-500">({group.tabs.length} tabs)</span>
+                    </h3>
+                    <div className="flex items-center space-x-2">
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowMoveMenu(prev => prev === group.id ? null : group.id)}
+                          className="text-gray-600 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50 transition-colors"
+                          title="Move group to window"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                          </svg>
+                        </button>
+                        {showMoveMenu === group.id && (
+                          <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-xl z-20 border border-gray-100">
+                            <button
+                              onClick={() => handleCreateWindow(group.id)}
+                              className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                              <span>Create New Window</span>
+                            </button>
+                            <div className="border-t border-gray-100 my-1"></div>
+                            {windows.map(window => {
+                              const isCurrentWindow = window.id.toString() === selectedWindow;
+                              return (
+                                <button
+                                  key={window.id}
+                                  onClick={() => handleMoveGroup(group.id, window.id)}
+                                  className={`w-full px-4 py-2 text-sm text-left ${
+                                    isCurrentWindow
+                                      ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
+                                      : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                                  }`}
+                                  disabled={isCurrentWindow}
+                                >
+                                  Window {windows.indexOf(window) + 1}
+                                  {window.focused ? ' (Current)' : ''}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleCloseGroup(group.id)}
+                        className="text-gray-600 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors"
+                        title="Close all tabs in this group"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  {group.tabs.map((tab, index) => (
+                    <DraggableTab
+                      key={tab.id}
+                      tab={tab}
+                      index={index}
+                      groupId={group.id}
+                      onTabClick={handleTabClick}
+                      onTabAction={handleTabAction}
+                      onTabMove={handleTabMove}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Analyze Button */}
+          <div className="sticky bottom-0 bg-white border-t border-gray-100 p-4 mt-auto">
+            <button
+              className={`w-full px-6 py-3 rounded-lg text-white font-medium shadow-sm transition-all ${
+                isAnalyzing
+                  ? 'bg-blue-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+              }`}
+              onClick={handleAnalyzeTabs}
+              disabled={isAnalyzing}
+            >
+              <div className="flex items-center justify-center space-x-2">
+                {isAnalyzing ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Analyzing...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <span>
+                      Analyze {selectedWindow === 'all' ? 'All' : 'Window'} Tabs
+                    </span>
+                  </>
+                )}
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </DndProvider>
