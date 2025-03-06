@@ -376,30 +376,28 @@ const Popup: React.FC = () => {
             </div>
           )}
 
-          {/* Current Window Tabs */}
-          {selectedWindow !== 'all' && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-4">
-              <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
-                <h3 className="font-medium text-gray-900">
-                  Current Window Tabs ({filteredTabs.length})
-                </h3>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {filteredTabs.map((tab, index) => (
-                  <DraggableTab
-                    key={tab.id}
-                    tab={tab}
-                    index={index}
-                    groupId="current"
-                    windows={windowsForDraggable}
-                    onTabClick={handleTabClick}
-                    onTabAction={handleTabAction}
-                    onTabMove={handleTabMove}
-                  />
-                ))}
-              </div>
+          {/* Current Window Tabs - Always shown */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-4">
+            <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
+              <h3 className="font-medium text-gray-900">
+                Current Window Tabs ({filteredTabs.length})
+              </h3>
             </div>
-          )}
+            <div className="divide-y divide-gray-100">
+              {filteredTabs.map((tab, index) => (
+                <DraggableTab
+                  key={tab.id}
+                  tab={tab}
+                  index={index}
+                  groupId="current"
+                  windows={windowsForDraggable}
+                  onTabClick={handleTabClick}
+                  onTabAction={handleTabAction}
+                  onTabMove={handleTabMove}
+                />
+              ))}
+            </div>
+          </div>
 
           {/* Tab Groups */}
           <div className="space-y-4">
