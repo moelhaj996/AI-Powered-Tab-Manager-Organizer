@@ -1,6 +1,83 @@
-# AI-Powered Tab Manager & Organizer
+# Mohaj AI - Intelligent Tab Management System
 
-A Chrome extension that uses AI to intelligently organize and manage your browser tabs.
+## System Architecture
+
+```mermaid
+graph TD
+    subgraph Mohaj_AI[Mohaj AI Tab Manager]
+        A[Chrome Extension] --> B[Popup Interface]
+        
+        subgraph Core_Components[Core Components]
+            B --> C[Window Manager]
+            B --> D[Tab Manager]
+            B --> E[Drag & Drop System]
+        end
+
+        subgraph State_Management[State Management]
+            F[Window State] --> B
+            G[Tab State] --> B
+        end
+
+        subgraph User_Actions[User Interactions]
+            H[Window Selection]
+            I[Tab Operations]
+            J[Drag & Drop]
+        end
+
+        C --> K[Chrome Windows API]
+        D --> L[Chrome Tabs API]
+        E --> M[React DnD]
+
+        H --> B
+        I --> B
+        J --> B
+    end
+
+    style Mohaj_AI fill:#f0f8ff,stroke:#333,stroke-width:2px
+    style Core_Components fill:#e6ffe6,stroke:#333,stroke-width:1px
+    style State_Management fill:#ffe6e6,stroke:#333,stroke-width:1px
+    style User_Actions fill:#fff0e6,stroke:#333,stroke-width:1px
+```
+
+## Main Features
+
+1. **Window Management**
+   - Create new windows
+   - Switch between windows
+   - View all windows simultaneously
+
+2. **Tab Management**
+   - View tabs in current window
+   - Pin/Unpin tabs
+   - Close tabs
+   - Reorder tabs
+
+3. **Drag & Drop System**
+   - Move tabs between windows
+   - Reorder tabs within windows
+   - Visual feedback during drag operations
+
+## Process Flow
+
+1. **Initialization**
+   - Load extension
+   - Fetch current windows and tabs
+   - Initialize drag & drop system
+
+2. **User Interaction**
+   - Select window from dropdown
+   - Perform tab operations
+   - Drag and drop tabs
+
+3. **State Updates**
+   - Update window state
+   - Update tab state
+   - Refresh UI
+
+4. **Chrome API Integration**
+   - Window operations
+   - Tab operations
+   - State synchronization
 
 ## Project Structure
 
