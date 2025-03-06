@@ -789,6 +789,13 @@ const Popup = () => {
     (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
         refreshTabs();
     }, [refreshTabs]);
+    // Filter tabs based on selected window
+    const filteredTabs = (0,react__WEBPACK_IMPORTED_MODULE_1__.useMemo)(() => {
+        if (selectedWindow === 'all') {
+            return tabs;
+        }
+        return tabs.filter(tab => tab.windowId === selectedWindow);
+    }, [tabs, selectedWindow]);
     const handleTabAction = async (action) => {
         if (!action.tabId) {
             console.error('No tab ID provided for action:', action);
@@ -836,18 +843,20 @@ const Popup = () => {
     const handleAnalyzeTabs = async () => {
         setIsAnalyzing(true);
         setError(null);
+        setGroups({}); // Clear existing groups
         try {
             const response = await new Promise((resolve) => {
                 chrome.runtime.sendMessage({
                     type: 'ANALYZE_TABS',
-                    windowId: selectedWindow === 'all' ? undefined : selectedWindow
+                    windowId: selectedWindow === 'all' ? undefined : selectedWindow,
+                    tabs: filteredTabs // Pass filtered tabs to background script
                 }, resolve);
             });
             if (!response || !response.groups) {
                 throw new Error('Invalid response from tab analysis');
             }
             const tabGroups = Object.entries(response.groups).reduce((acc, [groupId, indices]) => {
-                acc[groupId] = indices.map(index => tabs[index]).filter(tab => tab); // Filter out undefined tabs
+                acc[groupId] = indices.map(index => filteredTabs[index]).filter(tab => tab); // Use filtered tabs
                 return acc;
             }, {});
             setGroups(tabGroups);
@@ -895,9 +904,13 @@ const Popup = () => {
             setError('Failed to switch to tab. Please try again.');
         }
     }, [tabs]);
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "w-96 p-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", { className: "text-2xl font-bold mb-4", children: "AI Tab Manager" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "mb-4", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", { className: "w-full p-2 border rounded", value: selectedWindow, onChange: (e) => setSelectedWindow(e.target.value === 'all' ? 'all' : Number(e.target.value)), children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", { value: "all", children: "All Windows" }), windows.map((window, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("option", { value: window.id, children: ["Window ", index + 1, " (", window.tabs.length, " tabs)"] }, window.id)))] }) }), error && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4", children: error })), Object.entries(groups).map(([groupId, groupTabs]) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "border rounded p-4 mb-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex justify-between items-center mb-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h2", { className: "font-semibold", children: ["Group ", groupId] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "space-x-2", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => handleCloseGroup(groupId), className: "text-red-600 hover:text-red-800 px-2 py-1 rounded", title: "Close all tabs in this group", children: "Close Group" }) })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "space-y-2", children: groupTabs.map((tab) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("li", { className: "flex items-center justify-between group hover:bg-gray-50 p-2 rounded", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center space-x-2 flex-1", children: [tab.favIconUrl && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("img", { src: tab.favIconUrl, alt: "", className: "w-4 h-4" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "truncate flex-1 cursor-pointer hover:text-blue-600", onClick: () => tab.id && handleTabClick(tab.id), children: tab.title })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "space-x-1 opacity-0 group-hover:opacity-100 transition-opacity", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => tab.id && handleTabAction({ type: tab.pinned ? 'UNPIN' : 'PIN', tabId: tab.id }), className: "text-gray-600 hover:text-gray-800 px-2 py-1 rounded", title: tab.pinned ? "Unpin tab" : "Pin tab", children: "\uD83D\uDCCC" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => tab.id && handleTabAction({ type: 'CLOSE', tabId: tab.id }), className: "text-red-600 hover:text-red-800 px-2 py-1 rounded", title: "Close tab", children: "\u2715" })] })] }, tab.id))) })] }, groupId))), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "flex justify-end mt-4", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: `px-4 py-2 rounded text-white ${isAnalyzing
+    const handleWindowChange = (windowId) => {
+        setSelectedWindow(windowId);
+        setGroups({}); // Clear groups when window selection changes
+    };
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "w-96 p-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", { className: "text-2xl font-bold mb-4", children: "AI Tab Manager" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "mb-4", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", { className: "w-full p-2 border rounded", value: selectedWindow, onChange: (e) => handleWindowChange(e.target.value === 'all' ? 'all' : Number(e.target.value)), children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("option", { value: "all", children: ["All Windows (", tabs.length, " tabs)"] }), windows.map((window, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("option", { value: window.id, children: ["Window ", index + 1, " (", window.tabs.length, " tabs)", window.focused ? ' (Current)' : ''] }, window.id)))] }) }), error && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4", children: error })), Object.entries(groups).map(([groupId, groupTabs]) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "border rounded p-4 mb-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex justify-between items-center mb-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h2", { className: "font-semibold", children: ["Group ", groupId, " (", groupTabs.length, " tabs)"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "space-x-2", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => handleCloseGroup(groupId), className: "text-red-600 hover:text-red-800 px-2 py-1 rounded", title: "Close all tabs in this group", children: "Close Group" }) })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "space-y-2", children: groupTabs.map((tab) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("li", { className: "flex items-center justify-between group hover:bg-gray-50 p-2 rounded", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center space-x-2 flex-1", children: [tab.favIconUrl && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("img", { src: tab.favIconUrl, alt: "", className: "w-4 h-4" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "truncate flex-1 cursor-pointer hover:text-blue-600", onClick: () => tab.id && handleTabClick(tab.id), children: tab.title })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "space-x-1 opacity-0 group-hover:opacity-100 transition-opacity", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => tab.id && handleTabAction({ type: tab.pinned ? 'UNPIN' : 'PIN', tabId: tab.id }), className: "text-gray-600 hover:text-gray-800 px-2 py-1 rounded", title: tab.pinned ? "Unpin tab" : "Pin tab", children: "\uD83D\uDCCC" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => tab.id && handleTabAction({ type: 'CLOSE', tabId: tab.id }), className: "text-red-600 hover:text-red-800 px-2 py-1 rounded", title: "Close tab", children: "\u2715" })] })] }, tab.id))) })] }, groupId))), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "flex justify-end mt-4", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: `px-4 py-2 rounded text-white ${isAnalyzing
                         ? 'bg-blue-400 cursor-not-allowed'
-                        : 'bg-blue-500 hover:bg-blue-600'}`, onClick: handleAnalyzeTabs, disabled: isAnalyzing, children: isAnalyzing ? 'Analyzing...' : 'Analyze Tabs' }) })] }));
+                        : 'bg-blue-500 hover:bg-blue-600'}`, onClick: handleAnalyzeTabs, disabled: isAnalyzing, children: isAnalyzing ? 'Analyzing...' : `Analyze ${selectedWindow === 'all' ? 'All' : 'Window'} Tabs` }) })] }));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Popup);
 

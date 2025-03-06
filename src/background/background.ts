@@ -112,19 +112,26 @@ function processTabGroups(tabs: chrome.tabs.Tab[]) {
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'ANALYZE_TABS') {
-    const queryOptions: chrome.tabs.QueryInfo = request.windowId 
-      ? { windowId: request.windowId }
-      : {};
-
-    chrome.tabs.query(queryOptions, (tabs) => {
-      try {
-        const groups = processTabGroups(tabs);
+    try {
+      // Use the filtered tabs from the request if available
+      if (request.tabs) {
+        const groups = processTabGroups(request.tabs);
         sendResponse({ success: true, groups });
-      } catch (error: any) {
-        console.error('Error in tab analysis:', error);
-        sendResponse({ success: false, error: error.message || 'Unknown error occurred' });
+      } else {
+        // Fallback to querying tabs if not provided
+        const queryOptions: chrome.tabs.QueryInfo = request.windowId 
+          ? { windowId: request.windowId }
+          : {};
+
+        chrome.tabs.query(queryOptions, (tabs) => {
+          const groups = processTabGroups(tabs);
+          sendResponse({ success: true, groups });
+        });
       }
-    });
+    } catch (error: any) {
+      console.error('Error in tab analysis:', error);
+      sendResponse({ success: false, error: error.message || 'Unknown error occurred' });
+    }
     return true; // Will respond asynchronously
   }
 }); 

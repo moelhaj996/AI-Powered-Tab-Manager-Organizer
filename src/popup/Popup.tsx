@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Tab, TabGroup, Window, TabAction } from '../types';
 
 const Popup: React.FC = () => {
@@ -33,6 +33,14 @@ const Popup: React.FC = () => {
   useEffect(() => {
     refreshTabs();
   }, [refreshTabs]);
+
+  // Filter tabs based on selected window
+  const filteredTabs = useMemo(() => {
+    if (selectedWindow === 'all') {
+      return tabs;
+    }
+    return tabs.filter(tab => tab.windowId === selectedWindow);
+  }, [tabs, selectedWindow]);
 
   const handleTabAction = async (action: TabAction) => {
     if (!action.tabId) {
@@ -89,12 +97,14 @@ const Popup: React.FC = () => {
   const handleAnalyzeTabs = async () => {
     setIsAnalyzing(true);
     setError(null);
+    setGroups({}); // Clear existing groups
 
     try {
       const response = await new Promise<{ groups: { [key: string]: number[] } }>((resolve) => {
         chrome.runtime.sendMessage({ 
           type: 'ANALYZE_TABS',
-          windowId: selectedWindow === 'all' ? undefined : selectedWindow
+          windowId: selectedWindow === 'all' ? undefined : selectedWindow,
+          tabs: filteredTabs // Pass filtered tabs to background script
         }, resolve);
       });
 
@@ -103,7 +113,7 @@ const Popup: React.FC = () => {
       }
 
       const tabGroups = Object.entries(response.groups).reduce((acc, [groupId, indices]) => {
-        acc[groupId] = indices.map(index => tabs[index]).filter(tab => tab); // Filter out undefined tabs
+        acc[groupId] = indices.map(index => filteredTabs[index]).filter(tab => tab); // Use filtered tabs
         return acc;
       }, {} as { [key: string]: Tab[] });
 
@@ -153,6 +163,11 @@ const Popup: React.FC = () => {
     }
   }, [tabs]);
 
+  const handleWindowChange = (windowId: number | 'all') => {
+    setSelectedWindow(windowId);
+    setGroups({}); // Clear groups when window selection changes
+  };
+
   return (
     <div className="w-96 p-4">
       <h1 className="text-2xl font-bold mb-4">AI Tab Manager</h1>
@@ -162,12 +177,13 @@ const Popup: React.FC = () => {
         <select
           className="w-full p-2 border rounded"
           value={selectedWindow}
-          onChange={(e) => setSelectedWindow(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+          onChange={(e) => handleWindowChange(e.target.value === 'all' ? 'all' : Number(e.target.value))}
         >
-          <option value="all">All Windows</option>
+          <option value="all">All Windows ({tabs.length} tabs)</option>
           {windows.map((window, index) => (
             <option key={window.id} value={window.id}>
               Window {index + 1} ({window.tabs.length} tabs)
+              {window.focused ? ' (Current)' : ''}
             </option>
           ))}
         </select>
@@ -182,7 +198,7 @@ const Popup: React.FC = () => {
       {Object.entries(groups).map(([groupId, groupTabs]) => (
         <div key={groupId} className="border rounded p-4 mb-4">
           <div className="flex justify-between items-center mb-2">
-            <h2 className="font-semibold">Group {groupId}</h2>
+            <h2 className="font-semibold">Group {groupId} ({groupTabs.length} tabs)</h2>
             <div className="space-x-2">
               <button
                 onClick={() => handleCloseGroup(groupId)}
@@ -239,7 +255,7 @@ const Popup: React.FC = () => {
           onClick={handleAnalyzeTabs}
           disabled={isAnalyzing}
         >
-          {isAnalyzing ? 'Analyzing...' : 'Analyze Tabs'}
+          {isAnalyzing ? 'Analyzing...' : `Analyze ${selectedWindow === 'all' ? 'All' : 'Window'} Tabs`}
         </button>
       </div>
     </div>
