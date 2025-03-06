@@ -1,133 +1,40 @@
 # Mohaj AI - Smart Tab Management System
 
-## System Architecture
+## Main Process Flow
 
 ```mermaid
-graph TD
-    subgraph Mohaj_AI[Mohaj AI]
-        A[Chrome Extension] --> B[Popup Interface]
-        
-        subgraph Core_Components[Core Components]
-            B --> C[Window Manager]
-            B --> D[Tab Manager]
-            B --> E[Drag & Drop System]
-        end
-
-        subgraph State_Management[State Management]
-            F[Window State] --> B
-            G[Tab State] --> B
-        end
-
-        subgraph User_Actions[User Interactions]
-            H[Window Selection]
-            I[Tab Operations]
-            J[Drag & Drop]
-        end
-
-        C --> K[Chrome Windows API]
-        D --> L[Chrome Tabs API]
-        E --> M[React DnD]
-
-        H --> B
-        I --> B
-        J --> B
+flowchart TD
+    Start([Start]) --> Init[Initialize Extension]
+    Init --> LoadWindows[Load Chrome Windows]
+    LoadWindows --> LoadTabs[Fetch All Tabs]
+    
+    subgraph User_Interface[User Interface Layer]
+        LoadTabs --> UI[Show Window Manager]
+        UI --> |Select Window| WindowView[Display Window Tabs]
+        UI --> |Drag Tab| DragOp[Drag Operation]
+        UI --> |Click Actions| TabOp[Tab Operations]
     end
 
-    style Mohaj_AI fill:#f0f8ff,stroke:#333,stroke-width:2px
-    style Core_Components fill:#e6ffe6,stroke:#333,stroke-width:1px
-    style State_Management fill:#ffe6e6,stroke:#333,stroke-width:1px
-    style User_Actions fill:#fff0e6,stroke:#333,stroke-width:1px
-```
-
-## Main Features
-
-1. **Window Management**
-   - Create new windows
-   - Switch between windows
-   - View all windows simultaneously
-
-2. **Tab Management**
-   - View tabs in current window
-   - Pin/Unpin tabs
-   - Close tabs
-   - Reorder tabs
-
-3. **Drag & Drop System**
-   - Move tabs between windows
-   - Reorder tabs within windows
-   - Visual feedback during drag operations
-
-## Process Flow
-
-1. **Initialization**
-   - Load extension
-   - Fetch current windows and tabs
-   - Initialize drag & drop system
-
-2. **User Interaction**
-   - Select window from dropdown
-   - Perform tab operations
-   - Drag and drop tabs
-
-3. **State Updates**
-   - Update window state
-   - Update tab state
-   - Refresh UI
-
-4. **Chrome API Integration**
-   - Window operations
-   - Tab operations
-   - State synchronization
-
-## Project Structure
-
-```mermaid
-graph TD
-    subgraph Mohaj_AI_Structure[Mohaj AI Structure]
-        M[manifest.json] --> |Configures| EXT[Chrome Extension]
-        
-        subgraph Source_Code[Source Code]
-            SRC[src/] --> POP[popup/]
-            SRC --> BG[background/]
-            SRC --> CON[content/]
-            SRC --> TYP[types/]
-
-            POP --> |React Entry| IDX[index.tsx]
-            POP --> |Main Component| PC[Popup.tsx]
-            POP --> |Styles| CSS[index.css]
-            
-            BG --> |Service Worker| BS[background.ts]
-            
-            CON --> |Page Analysis| CS[content.ts]
-            
-            TYP --> |Interfaces| TI[index.ts]
-            TYP --> |Chrome Types| CT[chrome.d.ts]
-        end
-
-        subgraph Build_System[Build System]
-            WP[webpack.config.js] --> |Builds| DIST[dist/]
-            PC[postcss.config.js] --> |Processes| CSS
-            TC[tailwind.config.js] --> |Styles| CSS
-        end
-
-        subgraph Assets[Assets]
-            AST[assets/] --> IC16[icon16.png]
-            AST --> IC48[icon48.png]
-            AST --> IC128[icon128.png]
-        end
-
-        PKG[package.json] --> |Manages| DEP[Dependencies]
-        DEP --> |UI| REACT[React]
-        DEP --> |Styling| TWC[Tailwind CSS]
-
-        PC <--> |Messages| BS
-        CS <--> |Content Info| BS
+    subgraph Tab_Operations[Tab Management]
+        DragOp --> |Drop on Window| MoveTab[Move Tab to Window]
+        DragOp --> |Drop in List| ReorderTab[Reorder Tab Position]
+        TabOp --> |Pin| PinTab[Toggle Pin State]
+        TabOp --> |Close| CloseTab[Close Tab]
     end
 
-    style Mohaj_AI_Structure fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style Source_Code fill:#e6f3ff,stroke:#333,stroke-width:2px
-    style Build_System fill:#fff2e6,stroke:#333,stroke-width:2px
-    style Assets fill:#e6ffe6,stroke:#333,stroke-width:2px
+    subgraph State_Updates[State Management]
+        MoveTab --> UpdateState[Update State]
+        ReorderTab --> UpdateState
+        PinTab --> UpdateState
+        CloseTab --> UpdateState
+        UpdateState --> RefreshUI[Refresh UI]
+        RefreshUI --> UI
+    end
+
+    style Start fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style User_Interface fill:#e6f3ff,stroke:#333,stroke-width:2px
+    style Tab_Operations fill:#ffe6e6,stroke:#333,stroke-width:2px
+    style State_Updates fill:#e6ffe6,stroke:#333,stroke-width:2px
 ```
 
 ## Features
