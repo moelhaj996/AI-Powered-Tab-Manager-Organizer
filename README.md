@@ -3,54 +3,66 @@
 ## Main Process Flow
 
 ```mermaid
-flowchart TD
-    %% Initialization Process
-    Start([Mohaj AI]) --> Init[Initialize Extension]
-    Init --> LoadWindows[Load Chrome Windows]
-    LoadWindows --> LoadTabs[Fetch All Tabs]
+flowchart LR
+    %% Main Process Container
+    subgraph Process[" Mohaj AI Process "]
+        direction TB
+        
+        %% Core Flow
+        Start((Start)) --> Init["Initialize"]
+        Init --> Windows["Load Windows"]
+        Windows --> Tabs["Load Tabs"]
+        
+        %% Interface Layer
+        subgraph UI[" Interface "]
+            direction LR
+            Manager["Window Manager"] --> Actions
+            subgraph Actions
+                direction TB
+                Select["Select Window"] 
+                Drag["Drag & Drop"]
+                Operate["Tab Actions"]
+            end
+        end
+        
+        %% Operations Layer
+        subgraph Ops[" Operations "]
+            direction TB
+            Move["Move Tabs"]
+            Order["Reorder"]
+            Pin["Pin/Unpin"]
+            Close["Close"]
+        end
+        
+        %% State Layer
+        subgraph State[" State "]
+            direction LR
+            Update["Update"] --> Refresh["Refresh UI"]
+        end
+        
+        %% Connections
+        Tabs --> Manager
+        Actions --> Ops
+        Ops --> Update
+        Refresh --> Manager
+    end
     
-    %% User Interface Layer
-    subgraph User_Interface[" User Interface "]
-        direction TB
-        LoadTabs --> |Initialize| UI[Window Manager]
-        UI --> |"1"| WindowView["Display Tabs"]
-        UI --> |"2"| DragOp["Drag Operation"]
-        UI --> |"3"| TabOp["Tab Actions"]
-    end
-
-    %% Tab Operations
-    subgraph Tab_Operations[" Tab Management "]
-        direction TB
-        DragOp --> |"Drop"| MoveTab["Move Window"]
-        DragOp --> |"Sort"| ReorderTab["Reposition"]
-        TabOp --> |"Toggle"| PinTab["Pin/Unpin"]
-        TabOp --> |"Close"| CloseTab["Remove"]
-    end
-
-    %% State Management
-    subgraph State_Updates[" State Updates "]
-        direction TB
-        MoveTab & ReorderTab & PinTab & CloseTab --> UpdateState["Update"]
-        UpdateState --> RefreshUI["Refresh"]
-        RefreshUI --> |"Sync"| UI
-    end
-
     %% Styling
-    classDef default fill:white,stroke:#333,stroke-width:1px
-    classDef start fill:white,stroke:#000,stroke-width:2px
+    classDef default fill:white,stroke:#000,stroke-width:1px
+    classDef container fill:none,stroke:#000,stroke-width:1px
+    classDef start fill:none,stroke:#000,stroke-width:2px,stroke-dasharray: 5 5
     
+    %% Apply styles
     class Start start
+    class Process,UI,Ops,State container
     
-    %% Subgraph styling
-    style User_Interface fill:white,stroke:#000,stroke-width:1px
-    style Tab_Operations fill:white,stroke:#000,stroke-width:1px
-    style State_Updates fill:white,stroke:#000,stroke-width:1px
-    
-    %% Node styling - all nodes white with black borders
-    style UI,WindowView,DragOp,TabOp fill:white,stroke:#000,stroke-width:1px
-    style MoveTab,ReorderTab,PinTab,CloseTab fill:white,stroke:#000,stroke-width:1px
-    style UpdateState,RefreshUI fill:white,stroke:#000,stroke-width:1px
-    style Init,LoadWindows,LoadTabs fill:white,stroke:#000,stroke-width:1px
+    %% Node styles
+    style Manager fill:white,stroke:#000,stroke-width:1px
+    style Actions fill:none,stroke:none
+    style Select,Drag,Operate fill:white,stroke:#000,stroke-width:1px
+    style Move,Order,Pin,Close fill:white,stroke:#000,stroke-width:1px
+    style Update,Refresh fill:white,stroke:#000,stroke-width:1px
+    style Init,Windows,Tabs fill:white,stroke:#000,stroke-width:1px
 ```
 
 ## Features
