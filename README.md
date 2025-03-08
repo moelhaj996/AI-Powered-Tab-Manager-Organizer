@@ -46,12 +46,7 @@ flowchart LR
             Close["Close"]
         end
         
-        %% State Layer
-        subgraph State[" State "]
-            direction LR
-            Update["Update"] --> Refresh["Refresh UI"]
-        end
-        
+       
         %% Connections
         Tabs --> Manager
         Actions --> Ops
