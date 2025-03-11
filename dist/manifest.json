@@ -5,10 +5,7 @@
   "description": "Intelligently organize and manage your browser tabs using AI",
   "permissions": [
     "tabs",
-    "storage",
-    "activeTab",
-    "scripting",
-    "tabGroups"
+    "activeTab"
   ],
   "host_permissions": [
     "<all_urls>"
